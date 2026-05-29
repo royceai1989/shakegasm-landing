@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="70%">
+      <stop offset="0%" stop-color="#e91e63" stop-opacity="0.38"/>
+      <stop offset="55%" stop-color="#9c27b0" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#0a0a0a" stop-opacity="1"/>
+    </radialGradient>
+    <linearGradient id="meter" x1="0" x2="1">
+      <stop offset="0%" stop-color="#ff9800"/>
+      <stop offset="38%" stop-color="#4caf50"/>
+      <stop offset="62%" stop-color="#4caf50"/>
+      <stop offset="100%" stop-color="#f44336"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#0a0a0a"/>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <text x="600" y="320" text-anchor="middle" font-size="200" font-family="Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,system-ui">🍸</text>
+  <rect x="380" y="478" width="440" height="10" rx="5" fill="url(#meter)" opacity="0.85"/>
+  <text x="600" y="552" text-anchor="middle" font-size="14" fill="rgba(255,255,255,0.45)" font-family="system-ui,-apple-system,Segoe UI,sans-serif" letter-spacing="6">SHAKEGASM · BLOG</text>
+</svg>

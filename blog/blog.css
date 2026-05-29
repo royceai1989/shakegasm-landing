@@ -11,30 +11,47 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* --- top nav (subtle, brand only, no menu links — blog is unlisted) --- */
+/* --- top nav (same shape + classes as the landing page so navigation feels unified) --- */
 .blog-nav {
   position: sticky; top: 0; z-index: 50;
-  background: rgba(11,11,11,0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(11,11,11,0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid rgba(255,255,255,0.06);
-  padding: 14px 20px;
 }
 .blog-nav-inner {
-  max-width: 860px; margin: 0 auto;
-  display: flex; justify-content: space-between; align-items: center;
+  max-width: 1100px; margin: 0 auto;
+  padding: 14px 24px;
+  display: flex; align-items: center; justify-content: space-between;
 }
 .blog-logo {
   color: #fff; text-decoration: none; font-weight: 700;
   letter-spacing: 0.02em; font-size: 18px;
 }
 .blog-logo .dot { color: #e91e63; margin: 0 2px; }
+
+/* Nav link cluster — matches landing exactly */
+.blog-nav-links {
+  display: flex; gap: 8px; align-items: center;
+}
+.blog-nav-link {
+  font-size: 13px; padding: 8px 14px; border-radius: 8px;
+  color: rgba(255,255,255,0.7); text-decoration: none;
+  transition: color .15s;
+}
+.blog-nav-link:hover { color: #fff; }
 .blog-nav-cta {
-  background: #e91e63; color: #fff; text-decoration: none;
-  padding: 8px 18px; border-radius: 999px; font-weight: 600;
-  font-size: 14px; transition: background .15s;
+  background: #e91e63; color: #fff !important; text-decoration: none;
+  padding: 9px 16px; border-radius: 10px; font-weight: 600; font-size: 13px;
+  transition: background .15s;
 }
 .blog-nav-cta:hover { background: #c2185b; }
+
+@media (max-width: 640px) {
+  /* On narrow screens drop the section links, keep logo + CTA */
+  .blog-nav-link { display: none; }
+  .blog-nav-inner { padding: 12px 18px; }
+}
 
 /* --- container --- */
 .wrap { max-width: 720px; margin: 0 auto; padding: 64px 20px 80px; }
@@ -103,18 +120,39 @@ blockquote, .callout {
   font-size: 18px;
 }
 
-/* --- "related posts" cards --- */
-.related { display: grid; gap: 14px; grid-template-columns: 1fr; margin-top: 56px; }
+/* --- "related posts" cards with thumbnails --- */
+.related-section {
+  margin-top: 64px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 40px;
+}
+.related-heading {
+  font-size: 14px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(255,255,255,0.45); font-weight: 700;
+  margin-bottom: 24px;
+}
+.related { display: grid; gap: 18px; grid-template-columns: 1fr; }
 @media (min-width: 720px) { .related { grid-template-columns: 1fr 1fr; } }
 .related-card {
   display: block; text-decoration: none; color: inherit !important;
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 14px;
-  padding: 22px 22px;
+  overflow: hidden;
   transition: border-color .15s, transform .15s;
 }
 .related-card:hover { border-color: rgba(233,30,99,0.4); transform: translateY(-2px); }
+.related-card-image {
+  width: 100%;
+  aspect-ratio: 1200 / 630;
+  background: #0e0e0e;
+  background-size: cover; background-position: center;
+}
+.related-card-image img {
+  width: 100%; height: 100%; display: block;
+  object-fit: cover;
+}
+.related-card-body { padding: 18px 20px 20px; }
 .related-tag { font-size: 11px; color: #f472b6; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; }
 .related-title { font-size: 17px; font-weight: 700; color: #fff; line-height: 1.35; }
 
@@ -127,21 +165,41 @@ blockquote, .callout {
 }
 .blog-footer a { color: rgba(255,255,255,0.55); margin: 0 10px; }
 
-/* --- blog index list cards --- */
-.post-list { display: flex; flex-direction: column; gap: 18px; margin-top: 44px; }
+/* --- blog index list cards with featured images --- */
+.post-list { display: flex; flex-direction: column; gap: 22px; margin-top: 44px; }
 .post-card {
   display: block; text-decoration: none; color: inherit !important;
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 18px;
-  padding: 28px 28px;
+  overflow: hidden;
   transition: border-color .15s, transform .15s;
 }
 .post-card:hover { border-color: rgba(233,30,99,0.4); transform: translateY(-2px); }
+.post-card-image {
+  width: 100%;
+  aspect-ratio: 1200 / 630;
+  background: #0e0e0e;
+  background-size: cover; background-position: center;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.post-card-image img {
+  width: 100%; height: 100%; display: block;
+  object-fit: cover;
+}
+.post-card-body { padding: 24px 28px 28px; }
 .post-card-meta { font-size: 12px; color: rgba(255,255,255,0.5); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 10px; }
 .post-card-meta .tag { color: #f472b6; font-weight: 700; }
 .post-card-title { font-size: 24px; font-weight: 800; color: #fff; line-height: 1.25; margin-bottom: 10px; letter-spacing: -0.02em; }
 .post-card-excerpt { font-size: 15px; color: rgba(255,255,255,0.65); line-height: 1.6; }
+
+@media (min-width: 720px) {
+  /* Two-column grid on larger screens for index */
+  .post-list { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+}
+@media (min-width: 720px) and (max-width: 900px) {
+  .post-card-title { font-size: 20px; }
+}
 
 /* --- hero CTA banner (sits right under .blog-nav, first thing readers see) --- */
 .hero-cta {
