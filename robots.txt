@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Admin surface — not for indexing
+Disallow: /admin.html
+
+Sitemap: https://shakegasm.com/sitemap.xml

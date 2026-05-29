@@ -1,0 +1,224 @@
+/* Shared styles for /blog/. Imported by every post + the blog index.
+   Matches the main landing page's dark/pink language but adds typography
+   tuned for long-form reading. */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: #0b0b0b;
+  color: rgba(255,255,255,0.9);
+  font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- top nav (subtle, brand only, no menu links — blog is unlisted) --- */
+.blog-nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(11,11,11,0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 14px 20px;
+}
+.blog-nav-inner {
+  max-width: 860px; margin: 0 auto;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.blog-logo {
+  color: #fff; text-decoration: none; font-weight: 700;
+  letter-spacing: 0.02em; font-size: 18px;
+}
+.blog-logo .dot { color: #e91e63; margin: 0 2px; }
+.blog-nav-cta {
+  background: #e91e63; color: #fff; text-decoration: none;
+  padding: 8px 18px; border-radius: 999px; font-weight: 600;
+  font-size: 14px; transition: background .15s;
+}
+.blog-nav-cta:hover { background: #c2185b; }
+
+/* --- container --- */
+.wrap { max-width: 720px; margin: 0 auto; padding: 64px 20px 80px; }
+.wrap-wide { max-width: 860px; }
+
+/* --- typography --- */
+h1, h2, h3, h4 { color: #fff; font-weight: 800; letter-spacing: -0.02em; }
+h1 { font-size: 44px; line-height: 1.1; margin-bottom: 18px; }
+h2 { font-size: 28px; line-height: 1.25; margin: 48px 0 16px; }
+h3 { font-size: 22px; margin: 36px 0 12px; }
+p { margin-bottom: 18px; font-size: 17px; color: rgba(255,255,255,0.78); }
+strong { color: #fff; font-weight: 600; }
+em { color: rgba(255,255,255,0.95); }
+a { color: #f472b6; text-decoration: underline; text-decoration-color: rgba(244,114,182,0.4); }
+a:hover { text-decoration-color: #f472b6; }
+ul, ol { padding-left: 22px; margin-bottom: 22px; }
+li { margin-bottom: 8px; color: rgba(255,255,255,0.78); font-size: 17px; }
+
+/* --- post meta --- */
+.post-meta {
+  display: flex; gap: 14px; align-items: center;
+  font-size: 13px; color: rgba(255,255,255,0.5);
+  margin-bottom: 28px; letter-spacing: 0.04em; text-transform: uppercase;
+}
+.post-meta .dot { width: 4px; height: 4px; border-radius: 50%; background: rgba(255,255,255,0.3); }
+.post-tag { color: #f472b6; font-weight: 600; }
+
+/* --- inline CTA (used mid-post) --- */
+.cta-inline {
+  background: rgba(233,30,99,0.06);
+  border: 1px solid rgba(233,30,99,0.2);
+  border-radius: 14px;
+  padding: 22px 22px;
+  margin: 36px 0;
+  text-align: center;
+}
+.cta-inline-title { color: #fff; font-weight: 700; font-size: 18px; margin-bottom: 6px; }
+.cta-inline-sub { color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 16px; }
+.cta-btn {
+  display: inline-block; background: #e91e63; color: #fff !important; text-decoration: none !important;
+  padding: 12px 26px; border-radius: 999px; font-weight: 700; font-size: 14px;
+  transition: transform .15s, background .15s;
+}
+.cta-btn:hover { background: #c2185b; transform: translateY(-1px); }
+.cta-btn.secondary { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); }
+
+/* --- big end-of-post CTA --- */
+.cta-block {
+  background: linear-gradient(135deg, rgba(233,30,99,0.15) 0%, rgba(156,39,176,0.1) 100%);
+  border: 1px solid rgba(233,30,99,0.25);
+  border-radius: 20px;
+  padding: 40px 32px;
+  text-align: center;
+  margin-top: 64px;
+}
+.cta-block h3 { font-size: 28px; margin: 0 0 12px; }
+.cta-block p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 24px; }
+
+/* --- pull quote / callout --- */
+blockquote, .callout {
+  border-left: 3px solid #e91e63;
+  padding: 14px 20px; margin: 28px 0;
+  background: rgba(255,255,255,0.02);
+  font-style: italic;
+  color: rgba(255,255,255,0.9);
+  font-size: 18px;
+}
+
+/* --- "related posts" cards --- */
+.related { display: grid; gap: 14px; grid-template-columns: 1fr; margin-top: 56px; }
+@media (min-width: 720px) { .related { grid-template-columns: 1fr 1fr; } }
+.related-card {
+  display: block; text-decoration: none; color: inherit !important;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 22px 22px;
+  transition: border-color .15s, transform .15s;
+}
+.related-card:hover { border-color: rgba(233,30,99,0.4); transform: translateY(-2px); }
+.related-tag { font-size: 11px; color: #f472b6; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; }
+.related-title { font-size: 17px; font-weight: 700; color: #fff; line-height: 1.35; }
+
+/* --- footer --- */
+.blog-footer {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 32px 20px; margin-top: 64px;
+  text-align: center; color: rgba(255,255,255,0.4);
+  font-size: 13px;
+}
+.blog-footer a { color: rgba(255,255,255,0.55); margin: 0 10px; }
+
+/* --- blog index list cards --- */
+.post-list { display: flex; flex-direction: column; gap: 18px; margin-top: 44px; }
+.post-card {
+  display: block; text-decoration: none; color: inherit !important;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  padding: 28px 28px;
+  transition: border-color .15s, transform .15s;
+}
+.post-card:hover { border-color: rgba(233,30,99,0.4); transform: translateY(-2px); }
+.post-card-meta { font-size: 12px; color: rgba(255,255,255,0.5); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 10px; }
+.post-card-meta .tag { color: #f472b6; font-weight: 700; }
+.post-card-title { font-size: 24px; font-weight: 800; color: #fff; line-height: 1.25; margin-bottom: 10px; letter-spacing: -0.02em; }
+.post-card-excerpt { font-size: 15px; color: rgba(255,255,255,0.65); line-height: 1.6; }
+
+/* --- hero CTA banner (sits right under .blog-nav, first thing readers see) --- */
+.hero-cta {
+  background: linear-gradient(90deg, rgba(233,30,99,0.18), rgba(156,39,176,0.12));
+  border-bottom: 1px solid rgba(233,30,99,0.18);
+}
+.hero-cta-inner {
+  max-width: 860px; margin: 0 auto; padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+}
+.hero-cta-text {
+  font-size: 14px; color: rgba(255,255,255,0.9); font-weight: 500;
+}
+.hero-cta-text strong { color: #fff; }
+.hero-cta-text .accent { color: #f472b6; }
+.hero-cta-btn {
+  background: #e91e63; color: #fff !important; text-decoration: none !important;
+  padding: 9px 20px; border-radius: 999px; font-weight: 700; font-size: 13px;
+  white-space: nowrap; transition: background .15s, transform .15s;
+}
+.hero-cta-btn:hover { background: #c2185b; transform: translateY(-1px); }
+
+/* --- sticky bottom CTA bar (always visible while reading) --- */
+.sticky-cta {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+  background: rgba(11,11,11,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(233,30,99,0.3);
+  padding: 12px 20px;
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.4);
+}
+.sticky-cta-inner {
+  max-width: 860px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+}
+.sticky-cta-text {
+  font-size: 14px; color: rgba(255,255,255,0.85); font-weight: 500;
+}
+.sticky-cta-text .pulse { color: #f472b6; font-weight: 700; }
+.sticky-cta-btn {
+  background: #e91e63; color: #fff !important; text-decoration: none !important;
+  padding: 11px 22px; border-radius: 999px; font-weight: 700; font-size: 14px;
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(233,30,99,0.4);
+  transition: background .15s, transform .15s;
+}
+.sticky-cta-btn:hover { background: #c2185b; transform: translateY(-2px); }
+
+/* Padding so the sticky bar doesn't cover the footer */
+body { padding-bottom: 80px; }
+
+/* --- mini inline link (peppered through prose) --- */
+.cta-mini {
+  display: inline-block;
+  background: rgba(233,30,99,0.12);
+  border: 1px solid rgba(233,30,99,0.3);
+  color: #fff !important; text-decoration: none !important;
+  padding: 4px 12px; border-radius: 999px; font-weight: 600; font-size: 14px;
+  margin: 0 4px;
+  transition: background .15s;
+}
+.cta-mini:hover { background: rgba(233,30,99,0.25); }
+.cta-mini::after { content: " →"; opacity: 0.7; }
+
+/* --- responsive bumps --- */
+@media (max-width: 600px) {
+  h1 { font-size: 34px; }
+  h2 { font-size: 24px; }
+  p, li { font-size: 16px; }
+  .wrap { padding: 40px 18px 60px; }
+  .hero-cta-text { font-size: 13px; }
+  .sticky-cta-text { font-size: 13px; }
+  /* Hide the lead text on small screens, just the button shows */
+  .sticky-cta-text { display: none; }
+  .sticky-cta-inner { justify-content: center; }
+  .sticky-cta-btn { width: 100%; text-align: center; padding: 13px 22px; }
+}
