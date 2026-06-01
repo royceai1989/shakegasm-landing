@@ -3,28 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>How phone shake detection works — accelerometers, axes, and shake games</title>
-<meta name="description" content="A friendly tour of how your phone knows when you're shaking it. Inside accelerometers, three-axis motion, and the math that turns gestures into shake-game scores.">
+<title>How your phone actually knows you&#039;re shaking it (a friendly tour of accelerometers)</title>
+<meta name="description" content="A friendly tour of how your phone knows when you&#039;re shaking it. Inside accelerometers, three-axis motion, and the math that turns gestures into shake-game scores.">
 <link rel="canonical" href="https://shakegasm.com/blog/how-shake-detection-works.html">
 <meta name="robots" content="index, follow">
 
 <meta property="og:type" content="article">
-<meta property="og:title" content="How your phone knows you're shaking it">
-<meta property="og:description" content="A friendly tour of phone accelerometers and how shake games turn gestures into scores.">
+<meta property="og:title" content="How your phone actually knows you&#039;re shaking it (a friendly tour of accelerometers)">
+<meta property="og:description" content="A friendly tour of how your phone knows when you&#039;re shaking it. Inside accelerometers, three-axis motion, and the math that turns gestures into shake-game scores.">
 <meta property="og:url" content="https://shakegasm.com/blog/how-shake-detection-works.html">
-<meta property="og:image" content="https://shakegasm.com/icon-512.png">
+<meta property="og:image" content="https://shakegasm.com/blog/images/how-shake-detection-works-hero.png">
 <meta name="twitter:card" content="summary_large_image">
 
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Article",
-  "headline": "How your phone actually knows you're shaking it (a friendly tour of accelerometers)",
-  "description": "A friendly tour of phone accelerometers and how shake games turn gestures into scores.",
-  "image": "https://shakegasm.com/icon-512.png",
+  "headline": "How your phone actually knows you&#039;re shaking it (a friendly tour of accelerometers)",
+  "description": "A friendly tour of how your phone knows when you&#039;re shaking it. Inside accelerometers, three-axis motion, and the math that turns gestures into shake-game scores.",
+  "image": "https://shakegasm.com/blog/images/how-shake-detection-works-hero.png",
   "author": { "@type": "Organization", "name": "ShakeGasm" },
   "publisher": { "@type": "Organization", "name": "ShakeGasm", "logo": { "@type": "ImageObject", "url": "https://shakegasm.com/icon-512.png" } },
-  "datePublished": "2026-05-29",
+  "datePublished": "2026-06-01",
   "mainEntityOfPage": "https://shakegasm.com/blog/how-shake-detection-works.html"
 }
 </script>
@@ -50,9 +50,9 @@
 <div class="hero-cta">
   <div class="hero-cta-inner">
     <div class="hero-cta-text">
-      <strong>📱 See your phone's accelerometer in action.</strong> <span class="accent">Play ShakeGasm — live g-force readout included.</span>
+      <strong>💥 Free to play in your browser.</strong> <span class="accent">No install, no sign-up.</span>
     </div>
-    <a class="hero-cta-btn" href="https://app.shakegasm.com">Open it</a>
+    <a class="hero-cta-btn" href="https://app.shakegasm.com">Open the game</a>
   </div>
 </div>
 
@@ -66,207 +66,90 @@
     <span>May 2026</span>
   </div>
 
-  <h1>How your phone actually knows you're shaking it (a friendly tour of accelerometers)</h1>
+  <h1>How your phone actually knows you&#039;re shaking it (a friendly tour of accelerometers)</h1>
 
-  <p>
-    Inside every smartphone is a piece of silicon roughly the size of a grain of rice that measures
-    acceleration on three axes hundreds of times per second. It costs about 30 cents to manufacture
-    and it's responsible for everything from the auto-rotate on your photos to the step counter on
-    your fitness app to the shake-the-phone party game your friend keeps sending you scorecards
-    from.
-  </p>
+<figure style="margin:32px 0">
+  <img src="/blog/images/how-shake-detection-works-hero.png" alt="Smartphone frozen mid-shake against a black backdrop with three hot pink motion-blur trails along the X, Y, and Z axes" style="width:100%;border-radius:12px;display:block">
+  
+</figure>
 
-  <p>
-    Here's how it works — without the math degree.
-  </p>
+<p>Inside every smartphone is a piece of silicon roughly the size of a grain of rice that measures acceleration on three axes hundreds of times per second. It costs about 30 cents to manufacture and it's responsible for everything from the auto-rotate on your photos to the step counter on your fitness app to the shake-the-phone party game your friend keeps sending you scorecards from.</p>
+<p>Here's how it works — without the math degree.</p>
 
-  <h2>What's actually inside (the 30-second version)</h2>
+<h2>What&#039;s actually inside (the 30-second version)</h2>
+<p>The component is called a <strong>MEMS accelerometer</strong> — Micro-Electro-Mechanical System. Imagine a tiny weight suspended between four springs in a sealed chamber, with electrical contacts at each end. When the phone moves, the weight lags behind, the springs stretch slightly, and the electrical resistance changes. That resistance change is converted into a number that tells the phone <em>"you just moved this much in this direction."</em></p>
+<p>The phone does this three times — once for each axis (X, Y, Z) — and reports back a triplet like <code>(0.2, 9.8, 0.1)</code>. That triplet means "barely moving sideways, gravity is pulling you down on the Y axis, barely moving forward/back." That's a phone sitting flat on a table.</p>
 
-  <p>
-    The component is called a <strong>MEMS accelerometer</strong> — Micro-Electro-Mechanical
-    System. Imagine a tiny weight suspended between four springs in a sealed chamber, with
-    electrical contacts at each end. When the phone moves, the weight lags behind, the springs
-    stretch slightly, and the electrical resistance changes. That resistance change is converted
-    into a number that tells the phone <em>"you just moved this much in this direction."</em>
-  </p>
+<figure style="margin:32px 0">
+  <img src="/blog/images/how-shake-detection-works-body.png" alt="Extreme macro photograph of a MEMS accelerometer chip on a smartphone circuit board, lit by a single hot pink LED" style="width:100%;border-radius:12px;display:block">
+  
+</figure>
 
-  <p>
-    The phone does this three times — once for each axis (X, Y, Z) — and reports back a triplet
-    like <code>(0.2, 9.8, 0.1)</code>. That triplet means "barely moving sideways, gravity is pulling
-    you down on the Y axis, barely moving forward/back." That's a phone sitting flat on a table.
-  </p>
+<h2>Three axes, one shake</h2>
+<p>Every phone uses the same axis convention:</p>
+<ul>
+<li><strong>X axis</strong> — left-right across the screen</li>
+<li><strong>Y axis</strong> — up-down along the screen</li>
+<li><strong>Z axis</strong> — toward and away from your face</li>
+</ul>
+<p>The accelerometer reports values in <strong>m/s²</strong> (meters per second squared) or in multiples of "g" (gravity, which is 9.8 m/s²). A phone at rest reads about 1g of downward acceleration because gravity is always pulling. A vigorous shake registers 2-5g peaks. A catastrophic drop hits 50-100g.</p>
+<p>Shake games don't care about the direction you're shaking — they care about <em>how much total acceleration you're producing</em>. So the first thing every shake game does is collapse three axes into one number using the magnitude formula:</p>
 
-  <h2>Three axes, one shake</h2>
+<div class="callout"><p><code>magnitude = √(x² + y² + z²)</code></p></div>
 
-  <p>
-    Every phone uses the same axis convention:
-  </p>
+<p>That gives you a single "how energetic is this motion right now" number. Subtract 1g (gravity) and you have the actual acceleration the user is putting in.</p>
 
-  <ul>
-    <li><strong>X axis</strong> — left-right across the screen</li>
-    <li><strong>Y axis</strong> — up-down along the screen</li>
-    <li><strong>Z axis</strong> — toward and away from your face</li>
-  </ul>
+<div class="cta-inline">
+  <div class="cta-inline-title">See it in action</div>
+  <div class="cta-inline-sub">ShakeGasm shows you a live readout of your peak g while you play. Surprisingly satisfying to watch.</div>
+  <a class="cta-btn" href="https://app.shakegasm.com">Open ShakeGasm →</a>
+</div>
 
-  <p>
-    The accelerometer reports values in <strong>m/s²</strong> (meters per second squared) or in
-    multiples of "g" (gravity, which is 9.8 m/s²). A phone at rest reads about 1g of downward
-    acceleration because gravity is always pulling. A vigorous shake registers 2-5g peaks. A
-    catastrophic drop hits 50-100g.
-  </p>
+<h2>Sampling rate — why 100 reads per second isn&#039;t enough</h2>
+<p>Your phone's accelerometer can be polled at different rates. iOS lets developers choose between 10 Hz (slow), 60 Hz (normal), and up to 200 Hz (fast). Android is similar — typically 100 Hz by default, up to 400 Hz on some devices.</p>
+<p>For a step counter, 10 Hz is fine — you don't take more than ten steps per second. For a shake game, you need at least 60 Hz. Here's why: a "shake" is roughly a quarter-second of back-and-forth motion. If you only sample four times per second, you miss the peaks and the troughs and your "magnitude" reading averages out to something useless.</p>
+<p>ShakeGasm polls at 60 Hz and applies a small smoothing window so single-frame spikes don't register as "you shook the phone." The trade-off is responsiveness vs. noise — too smooth and the game feels laggy, too raw and a single bumpy footstep registers as a shake.</p>
+<h2>The &quot;shake event&quot; detection problem</h2>
+<p>There's no built-in OS event called "shake happened." Both iOS and Android expose the raw accelerometer stream, and it's the developer's job to interpret it.</p>
+<p>The classic algorithm:</p>
+<ol>
+<li>Calculate the magnitude every frame</li>
+<li>Subtract gravity baseline (~9.8 m/s²)</li>
+<li>Pass through a high-pass filter to ignore slow drift</li>
+<li>Look for "zero crossings" — moments where the acceleration changes direction</li>
+<li>Count crossings over a sliding 1-second window — that's your shake rate</li>
+</ol>
+<p>The result is a number like "8 shakes per second" or "peak g of 3.2." Map those to your game's sweet-spot zones, render the meter, fire the haptic, play the audio — and you have a shake game.</p>
+<blockquote>The hardest part isn't the detection — it's the calibration. A vigorous shake on one phone is a gentle shake on another. iPhone accelerometers tend to be smoother than Android. Older devices undersample. ShakeGasm has to be tuned against a matrix of phones to feel right everywhere.</blockquote>
 
-  <p>
-    Shake games don't care about the direction you're shaking — they care about
-    <em>how much total acceleration you're producing</em>. So the first thing every shake game
-    does is collapse three axes into one number using the magnitude formula:
-  </p>
+<div class="cta-inline">
+  <div class="cta-inline-title">Want to see your own peak g?</div>
+  <div class="cta-inline-sub">ShakeGasm shows a live readout while you play. 2g is gentle. 5g is going. 8g+ is showing off.</div>
+  <a class="cta-btn" href="https://app.shakegasm.com">Check your peak g →</a>
+</div>
 
-  <p style="font-family: monospace; background: rgba(255,255,255,0.04); padding: 14px 20px; border-radius: 8px; font-size: 15px;">
-    magnitude = √(x² + y² + z²)
-  </p>
+<h2>What &quot;Beast mode&quot; actually changes</h2>
+<p>People often assume "harder difficulty" in a shake game means "shake harder." It's almost always the opposite. The sweet-spot zone <em>narrows</em>. The drain rate when you're outside the zone <em>accelerates</em>. The detection algorithm gets more sensitive to overshake.</p>
+<p>In ShakeGasm specifically:</p>
+<ul>
+<li><strong>Vanilla</strong> — generous sweet spot (40% of the acceleration range), slow drain</li>
+<li><strong>Spicy</strong> — moderate sweet spot (20% range), normal drain</li>
+<li><strong>Beast</strong> — narrow sweet spot (8% range), fast drain, overshake penalty</li>
+</ul>
+<p>On Beast mode you actually have to shake <em>gentler and more precisely</em>, not harder. People who try to brute-force it lose every time.</p>
+<h2>Why some shake games feel &quot;broken&quot; — sensor differences</h2>
+<p>Two phones rarely report the same acceleration for the same gesture. Phone weight matters (heavier phones generate higher peaks for the same motion because of inertia). Case material matters (a thick case absorbs some of the shake before it reaches the sensor). Even battery level matters slightly (a fuller battery shifts the phone's center of mass).</p>
+<p>The biggest variable, though, is the sensor model itself. Phones from 2018 used much noisier accelerometers than 2023+ phones. A game tuned only on a Pixel 8 might feel weirdly oversensitive on a Samsung Galaxy S21.</p>
+<p>The fix is per-device auto-calibration: read the first few seconds of motion when the game starts, establish a baseline, and scale the sensitivity to match. ShakeGasm does this in the "Warming Up" phase — the first 3-5 seconds of every round.</p>
+<h2>The future: pressure-sensitive backs, IMUs, and AI motion classification</h2>
+<p>Where shake detection goes next is interesting. Newer phones have <strong>gyroscopes</strong> (rotational motion) in addition to accelerometers (linear motion), which lets you detect things like "the phone is being twisted" or "the phone is being tilted while shaken." Combined, the two sensors form an <strong>IMU</strong> — inertial measurement unit — that can describe gesture in much richer detail.</p>
+<p>Some 2025 phones added pressure sensors on the back panel, opening up "squeeze-while-shake" as a viable game input. And on the software side, on-device ML models can now classify gesture patterns ("this looks like a flick, this looks like a circular motion") without needing a hand-tuned algorithm.</p>
+<p>For shake games, the practical implication is that the next generation of these games is going to feel a lot more nuanced. Not just "shake harder or softer" but "shake with this rhythm" or "shake while tilted forward." The phone is finally catching up to what your wrist can express.</p>
 
-  <p>
-    That gives you a single "how energetic is this motion right now" number. Subtract 1g (gravity)
-    and you have the actual acceleration the user is putting in.
-  </p>
-
-  <div class="cta-inline">
-    <div class="cta-inline-title">See it in action</div>
-    <div class="cta-inline-sub">ShakeGasm shows you a live readout of your peak g while you play. Surprisingly satisfying to watch.</div>
-    <a class="cta-btn" href="https://app.shakegasm.com">Open ShakeGasm →</a>
-  </div>
-
-  <h2>Sampling rate — why 100 reads per second isn't enough</h2>
-
-  <p>
-    Your phone's accelerometer can be polled at different rates. iOS lets developers choose between
-    10 Hz (slow), 60 Hz (normal), and up to 200 Hz (fast). Android is similar — typically 100 Hz
-    by default, up to 400 Hz on some devices.
-  </p>
-
-  <p>
-    For a step counter, 10 Hz is fine — you don't take more than ten steps per second. For a shake
-    game, you need at least 60 Hz. Here's why: a "shake" is roughly a quarter-second of back-and-forth
-    motion. If you only sample four times per second, you miss the peaks and the troughs and your
-    "magnitude" reading averages out to something useless.
-  </p>
-
-  <p>
-    ShakeGasm polls at 60 Hz and applies a small smoothing window so single-frame spikes don't
-    register as "you shook the phone." The trade-off is responsiveness vs. noise — too smooth and
-    the game feels laggy, too raw and a single bumpy footstep registers as a shake.
-  </p>
-
-  <h2>The "shake event" detection problem</h2>
-
-  <p>
-    There's no built-in OS event called "shake happened." Both iOS and Android expose the raw
-    accelerometer stream, and it's the developer's job to interpret it.
-  </p>
-
-  <p>
-    The classic algorithm:
-  </p>
-
-  <ol>
-    <li>Calculate the magnitude every frame</li>
-    <li>Subtract gravity baseline (~9.8 m/s²)</li>
-    <li>Pass through a high-pass filter to ignore slow drift</li>
-    <li>Look for "zero crossings" — moments where the acceleration changes direction</li>
-    <li>Count crossings over a sliding 1-second window — that's your shake rate</li>
-  </ol>
-
-  <p>
-    The result is a number like "8 shakes per second" or "peak g of 3.2." Map those to your game's
-    sweet-spot zones, render the meter, fire the haptic, play the audio — and you have a shake game.
-  </p>
-
-  <blockquote>
-    The hardest part isn't the detection — it's the calibration. A vigorous shake on one phone
-    is a gentle shake on another. iPhone accelerometers tend to be smoother than Android. Older
-    devices undersample. ShakeGasm has to be tuned against a matrix of phones to feel right
-    everywhere.
-  </blockquote>
-
-  <div class="cta-inline">
-    <div class="cta-inline-title">Want to see your own peak g?</div>
-    <div class="cta-inline-sub">ShakeGasm shows a live readout while you play. 2g is gentle. 5g is going. 8g+ is showing off.</div>
-    <a class="cta-btn" href="https://app.shakegasm.com">Check your peak g →</a>
-  </div>
-
-  <h2>What "Beast mode" actually changes</h2>
-
-  <p>
-    People often assume "harder difficulty" in a shake game means "shake harder." It's almost
-    always the opposite. The sweet-spot zone <em>narrows</em>. The drain rate when you're outside
-    the zone <em>accelerates</em>. The detection algorithm gets more sensitive to overshake.
-  </p>
-
-  <p>
-    In ShakeGasm specifically:
-  </p>
-
-  <ul>
-    <li><strong>Vanilla</strong> — generous sweet spot (40% of the acceleration range), slow drain</li>
-    <li><strong>Spicy</strong> — moderate sweet spot (20% range), normal drain</li>
-    <li><strong>Beast</strong> — narrow sweet spot (8% range), fast drain, overshake penalty</li>
-  </ul>
-
-  <p>
-    On Beast mode you actually have to shake <em>gentler and more precisely</em>, not harder.
-    People who try to brute-force it lose every time.
-  </p>
-
-  <h2>Why some shake games feel "broken" — sensor differences</h2>
-
-  <p>
-    Two phones rarely report the same acceleration for the same gesture. Phone weight matters
-    (heavier phones generate higher peaks for the same motion because of inertia). Case material
-    matters (a thick case absorbs some of the shake before it reaches the sensor). Even battery
-    level matters slightly (a fuller battery shifts the phone's center of mass).
-  </p>
-
-  <p>
-    The biggest variable, though, is the sensor model itself. Phones from 2018 used much noisier
-    accelerometers than 2023+ phones. A game tuned only on a Pixel 8 might feel weirdly oversensitive
-    on a Samsung Galaxy S21.
-  </p>
-
-  <p>
-    The fix is per-device auto-calibration: read the first few seconds of motion when the game
-    starts, establish a baseline, and scale the sensitivity to match. ShakeGasm does this in the
-    "Warming Up" phase — the first 3-5 seconds of every round.
-  </p>
-
-  <h2>The future: pressure-sensitive backs, IMUs, and AI motion classification</h2>
-
-  <p>
-    Where shake detection goes next is interesting. Newer phones have <strong>gyroscopes</strong>
-    (rotational motion) in addition to accelerometers (linear motion), which lets you detect
-    things like "the phone is being twisted" or "the phone is being tilted while shaken."
-    Combined, the two sensors form an <strong>IMU</strong> — inertial measurement unit — that
-    can describe gesture in much richer detail.
-  </p>
-
-  <p>
-    Some 2025 phones added pressure sensors on the back panel, opening up "squeeze-while-shake"
-    as a viable game input. And on the software side, on-device ML models can now classify
-    gesture patterns ("this looks like a flick, this looks like a circular motion") without
-    needing a hand-tuned algorithm.
-  </p>
-
-  <p>
-    For shake games, the practical implication is that the next generation of these games is
-    going to feel a lot more nuanced. Not just "shake harder or softer" but "shake with this
-    rhythm" or "shake while tilted forward." The phone is finally catching up to what your wrist
-    can express.
-  </p>
-
-  <!-- End-of-post CTA -->
   <div class="cta-block">
-    <h3>Now go put it to work.</h3>
-    <p>You now know more about phone accelerometers than 99% of people. The other 1% are reading this on a phone they're about to shake.</p>
-    <a class="cta-btn" href="https://app.shakegasm.com">Play ShakeGasm</a>
+    <h3>Stop reading. Start shaking.</h3>
+    <p>Five stages. One climax. Free in your browser, free on Android — voice packs optional.</p>
+    <a class="cta-btn" href="https://app.shakegasm.com">Play ShakeGasm now</a>
   </div>
 
   <div class="related-section">
@@ -274,25 +157,24 @@
     <div class="related">
       <a class="related-card" href="/blog/why-phone-reflex-games-feel-so-good.html">
         <div class="related-card-image">
-          <img src="/blog/images/reflex-cover.svg" alt="" loading="lazy">
+          <img src="/icon-512.png" alt="" loading="lazy">
         </div>
         <div class="related-card-body">
           <div class="related-tag">Why it works</div>
-          <div class="related-title">Why phone reflex games feel so good</div>
+          <div class="related-title">Why phone reflex games feel so good (and why shake-the-phone games are having a moment)</div>
         </div>
       </a>
       <a class="related-card" href="/blog/best-phone-party-games-2026.html">
         <div class="related-card-image">
-          <img src="/blog/images/party-cover.svg" alt="" loading="lazy">
+          <img src="/blog/images/best-phone-party-games-2026-hero.png" alt="" loading="lazy">
         </div>
         <div class="related-card-body">
           <div class="related-tag">Roundup</div>
-          <div class="related-title">The 7 best phone party games for 2026</div>
+          <div class="related-title">The 7 best phone party games for 2026 (and why one of them is ShakeGasm)</div>
         </div>
       </a>
     </div>
   </div>
-
 </article>
 
 <footer class="blog-footer">
@@ -307,7 +189,7 @@
 <div class="sticky-cta">
   <div class="sticky-cta-inner">
     <div class="sticky-cta-text">
-      <span class="pulse">Put your accelerometer to work.</span> Free, no install.
+      <span class="pulse">Shake your phone.</span> See what happens. Free, browser-based.
     </div>
     <a class="sticky-cta-btn" href="https://app.shakegasm.com">Play ShakeGasm →</a>
   </div>
