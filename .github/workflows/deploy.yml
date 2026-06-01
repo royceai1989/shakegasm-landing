@@ -1,0 +1,32 @@
+name: Deploy to Cloudflare
+
+# Permanent auto-deploy. Every push to main (including the OpenClaw blog
+# agent's commits via the shakegasm-blog MCP) deploys the static site to the
+# existing "shakegasm-landing" Cloudflare Worker, which serves shakegasm.com.
+#
+# Requires two GitHub repo secrets (Settings -> Secrets and variables -> Actions):
+#   CLOUDFLARE_API_TOKEN   — token with "Edit Cloudflare Workers" permission
+#   CLOUDFLARE_ACCOUNT_ID  — your Cloudflare account ID
+#
+# workflow_dispatch lets you trigger a deploy manually from the Actions tab
+# (useful right after adding the secrets, to deploy without a fresh commit).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy

@@ -1,0 +1,9 @@
+# Files in this repo that should NOT be uploaded as public static assets.
+# Gitignore syntax. Everything else (html, css, png, svg, mp3, robots, sitemap)
+# is served as-is from shakegasm.com.
+.git
+.github
+wrangler.jsonc
+.assetsignore
+README.md
+blog/images/_generate.py

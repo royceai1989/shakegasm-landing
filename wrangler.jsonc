@@ -1,0 +1,16 @@
+{
+  // Cloudflare Worker config for the ShakeGasm landing site + blog.
+  // This is an assets-only Worker (no server script) — it just serves the
+  // static HTML/CSS/images in this repo. `wrangler deploy` (run by the
+  // GitHub Action in .github/workflows/deploy.yml) pushes the repo contents
+  // to the existing "shakegasm-landing" Worker, which already has the
+  // shakegasm.com custom domain attached.
+  //
+  // The Worker name MUST match the existing Worker so the custom domain and
+  // workers.dev subdomain stay attached. Do not rename it.
+  "name": "shakegasm-landing",
+  "compatibility_date": "2026-05-31",
+  "assets": {
+    "directory": "./"
+  }
+}
