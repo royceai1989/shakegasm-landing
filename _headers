@@ -1,0 +1,29 @@
+# Cloudflare edge cache rules for the static site.
+# HTML + sitemap revalidate every request so newly published blog posts (and
+# edits) appear immediately instead of being pinned behind a stale cache.
+# Without this, a 404 cached before a post existed can keep the post invisible
+# until the cache TTL expires. Critical for the autonomous daily-publish flow.
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+/blog/*
+  Cache-Control: public, max-age=0, must-revalidate
+/sitemap.xml
+  Cache-Control: public, max-age=0, must-revalidate
+/robots.txt
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Immutable-ish binary assets can cache hard — their content doesn't change
+# without a filename change.
+/blog/images/*
+  Cache-Control: public, max-age=2592000
+/previews/*
+  Cache-Control: public, max-age=2592000
+/*.png
+  Cache-Control: public, max-age=2592000
+/*.svg
+  Cache-Control: public, max-age=2592000
+/*.mp3
+  Cache-Control: public, max-age=2592000
