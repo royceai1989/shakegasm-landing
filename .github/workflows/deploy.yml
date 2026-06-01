@@ -16,6 +16,14 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# The blog MCP makes several commits per post (one per image, the post, the
+# index rebuild, the sitemap rebuild). Without this, each commit spawns its
+# own deploy. cancel-in-progress collapses a burst of commits into a single
+# deploy of the final state — cheaper and avoids races.
+concurrency:
+  group: deploy-cloudflare
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
