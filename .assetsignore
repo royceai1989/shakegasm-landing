@@ -1,9 +1,17 @@
 # Files in this repo that should NOT be uploaded as public static assets.
 # Gitignore syntax. Everything else (html, css, png, svg, mp3, robots, sitemap)
 # is served as-is from shakegasm.com.
+#
+# node_modules + package files: the CI deploy installs wrangler into the repo
+# root, creating a 100+ MB node_modules. It must never be treated as a static
+# asset (Cloudflare rejects files over 25 MiB).
 .git
 .github
+node_modules
+package.json
+package-lock.json
 wrangler.jsonc
 .assetsignore
 README.md
 blog/images/_generate.py
+*.log
