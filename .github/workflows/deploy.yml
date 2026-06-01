@@ -29,4 +29,8 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          # Pin a modern wrangler. The action's default (3.90.0) predates
+          # full assets-only Worker support and fails with "Missing
+          # entry-point" on a static site that has no server script.
+          wranglerVersion: "4.40.0"
           command: deploy
