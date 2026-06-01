@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The 10-game rolling median: fairer party leaderboards</title>
+<meta name="description" content="Raw high scores wreck ShakeGasm parties after one lucky round. Swap them for a 10-game rolling median: setup, three host rules, when it fails.">
+<link rel="canonical" href="https://shakegasm.com/blog/test-publish-20260601-0137.html">
+<meta name="robots" content="index, follow">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="The 10-game rolling median: fairer party leaderboards">
+<meta property="og:description" content="Raw high scores wreck ShakeGasm parties after one lucky round. Swap them for a 10-game rolling median: setup, three host rules, when it fails.">
+<meta property="og:url" content="https://shakegasm.com/blog/test-publish-20260601-0137.html">
+<meta property="og:image" content="https://shakegasm.com/icon-512.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "The 10-game rolling median: fairer party leaderboards",
+  "description": "Raw high scores wreck ShakeGasm parties after one lucky round. Swap them for a 10-game rolling median: setup, three host rules, when it fails.",
+  "image": "https://shakegasm.com/icon-512.png",
+  "author": { "@type": "Organization", "name": "ShakeGasm" },
+  "publisher": { "@type": "Organization", "name": "ShakeGasm", "logo": { "@type": "ImageObject", "url": "https://shakegasm.com/icon-512.png" } },
+  "datePublished": "2026-06-01",
+  "mainEntityOfPage": "https://shakegasm.com/blog/test-publish-20260601-0137.html"
+}
+</script>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/blog/blog.css">
+</head>
+<body>
+
+<nav class="blog-nav">
+  <div class="blog-nav-inner">
+    <a class="blog-logo" href="/">SHAKE<span class="dot">·</span>GASM</a>
+    <div class="blog-nav-links">
+      <a class="blog-nav-link" href="/#voices">Voices</a>
+      <a class="blog-nav-link" href="/#how">How it works</a>
+      <a class="blog-nav-link" href="/#faq">FAQ</a>
+      <a class="blog-nav-cta" href="https://app.shakegasm.com">Open app →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero-cta">
+  <div class="hero-cta-inner">
+    <div class="hero-cta-text">
+      <strong>💥 Free to play in your browser.</strong> <span class="accent">No install, no sign-up.</span>
+    </div>
+    <a class="hero-cta-btn" href="https://app.shakegasm.com">Open the game</a>
+  </div>
+</div>
+
+<article class="wrap">
+
+  <div class="post-meta">
+    <span class="post-tag">How it works</span>
+    <span class="dot"></span>
+    <span>5 min read</span>
+    <span class="dot"></span>
+    <span>May 2026</span>
+  </div>
+
+  <h1>The 10-game rolling median: fairer party leaderboards</h1>
+
+<p>Most ShakeGasm parties die the same way. One player posts an absurd high score in round one, the leaderboard locks them in, and everyone else quietly stops trying. Two rounds later you are running a memorial service for the lobby. The fix is not raising the ceiling or capping scores at the top. The fix is replacing the raw high score with a rolling median across the last ten games per player.</p>
+<p>This post walks through why the swap works, how to set it up in five minutes, and where it falls apart. If you host more than one shake-game night a year, this is the leaderboard you want behind the speakers.</p>
+
+<h2>Why raw high scores break party leaderboards</h2>
+<p>The classic leaderboard rewards a single perfect game. That is fine for solo grinding on the couch. It collapses in a party setting because parties are noisy. Someone gets a lucky meter on round one, the crowd cheers, and now every other player is fighting a number they cannot match without the same noise-adjacent fluke. Variance wins, and variance is the worst storyteller in the room.</p>
+<p>You see the same dynamic at trivia nights when one team sweeps the picture round. The score gap stops mapping to skill and starts mapping to one moment of luck. People disengage. Drinks get refilled. The night ends 40 minutes early and the host wonders what went wrong, when nothing went wrong except the scoring system.</p>
+<p>A rolling median asks a different question. Not who hit the peak, but who is consistently sharp across ten attempts. That second question rewards practice, rewards focus, and rewards the player who keeps showing up to the meter on round eight when everyone else has gone loose.</p>
+
+<h2>The 10-game rolling median, explained</h2>
+<p>Each player keeps a running list of their last ten scores. The leaderboard shows the median of that list, not the maximum and not the mean. Median is the middle value when you sort the ten scores from low to high. With ten games the median is the average of the fifth and sixth values in the sorted list.</p>
+<p>Median beats average here because party scoring has outliers in both directions. A loud round will tank a score because the player flinches. A silent room with one cheering friend will inflate one round. Average drags the leaderboard toward those flukes. Median ignores them and tells you who is steady.</p>
+<p>Why ten and not five or twenty? Five games is too few to absorb a noisy round, so one bad game still cracks the median in half. Twenty games is too many for a single party night, which usually clocks 12 to 18 rounds per player before people drift to the kitchen. Ten lands in the middle. It also gives newcomers a reasonable on-ramp: by round eleven their first weak game falls off the list, and they catch up fast.</p>
+
+<div class="callout"><p>Median ignores the flukes. Mean buries the whole night under them.</p></div>
+
+<h2>How to roll it out at your next party</h2>
+<p>The setup is short. Pick a host. Have the host open <a href="https://app.shakegasm.com">ShakeGasm</a> in lobby mode and read out scores as players finish each round. A second person keeps a sheet with each player name down the side and ten score columns across. Phones work fine for this, but a paper sheet on the wall reads faster from across the room.</p>
+<p>For the first ten rounds, the leaderboard is empty by design. After that, the median populates and you start announcing it between rounds. Three rules keep the night honest:</p>
+<ul>
+<li>No skipping rounds. A skipped game counts as zero on the list.</li>
+<li>No replaying rounds. The score that lands is the score that counts.</li>
+<li>The host plays too, and posts a median like anyone else in the room.</li>
+</ul>
+<p>This format works cleanly for groups of 4 to 16. Above 16 you split into two <a href="https://app.shakegasm.com">in-app lobbies</a> and merge medians at the end of the night. Below 4 the median is too jittery and you should track total score across the evening and call it good.</p>
+
+<h2>When the rolling median fails</h2>
+<p>Two failure modes show up in practice. First, tight nights with low round counts. If players get fewer than ten games in before the room thins out, the median is not yet populated and the leaderboard reads blank for most of the party. The fix is to shrink the rolling window to the actual game count once the night ends and recalculate by hand. It feels late, but the final standings still mean something instead of a wall of zeros for everyone except the early arrivals.</p>
+<p>Second, mixed skill rooms with a wide gap. A median rewards consistency, which means a steady-handed beginner can beat a chaotic veteran on a given night. That is the right outcome for fairness, but if your room expects the best player to win, the median will read as unfair. Tell players the rule upfront, before the first round and before the first drink, not after the standings post. Once they know consistency is the prize, the night plays differently from round one and the veterans tighten up.</p>
+<p>Use the rolling median when you want the leaderboard to track skill across a party, not luck across one round. Use raw high scores when you want a single jaw-drop moment to anchor the night. They are different tools for different rooms. Pick the one that matches the party you are running, and let the <a href="https://app.shakegasm.com">in-app scoreboard</a> do the median math for you.</p>
+
+<div class="cta-inline">
+  <div class="cta-inline-title">Run a fairer leaderboard tonight</div>
+  <div class="cta-inline-sub">Ten games, one median, no flukes carrying the standings.</div>
+  <a class="cta-btn" href="https://app.shakegasm.com">Open ShakeGasm →</a>
+</div>
+
+  <div class="cta-block">
+    <h3>Stop reading. Start shaking.</h3>
+    <p>Five stages. One climax. Free in your browser, free on Android — voice packs optional.</p>
+    <a class="cta-btn" href="https://app.shakegasm.com">Play ShakeGasm now</a>
+  </div>
+
+  <div class="related-section">
+    <div class="related-heading">Keep reading</div>
+    <div class="related">
+      <a class="related-card" href="/blog/phone-shake-games-company-offsites-2026.html">
+        <div class="related-card-image">
+          <img src="/blog/images/offsite-shake-games-hero-2026-05-31.png" alt="" loading="lazy">
+        </div>
+        <div class="related-card-body">
+          <div class="related-tag">How it works</div>
+          <div class="related-title">Phone shake games for company offsites: the icebreaker that works</div>
+        </div>
+      </a>
+      <a class="related-card" href="/blog/sober-curious-phone-party-games-2026.html">
+        <div class="related-card-image">
+          <img src="/blog/images/sober-curious-party-hero-2026-05-31.png" alt="" loading="lazy">
+        </div>
+        <div class="related-card-body">
+          <div class="related-tag">Why it works</div>
+          <div class="related-title">Sober-curious party games: phone shakes that still hit</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</article>
+
+<footer class="blog-footer">
+  © 2026 ShakeGasm ·
+  <a href="/">Home</a> ·
+  <a href="/blog/">Blog</a> ·
+  <a href="/privacy.html">Privacy</a> ·
+  <a href="/terms.html">Terms</a> ·
+  <a href="https://app.shakegasm.com">Open app</a>
+</footer>
+
+<div class="sticky-cta">
+  <div class="sticky-cta-inner">
+    <div class="sticky-cta-text">
+      <span class="pulse">Shake your phone.</span> See what happens. Free, browser-based.
+    </div>
+    <a class="sticky-cta-btn" href="https://app.shakegasm.com">Play ShakeGasm →</a>
+  </div>
+</div>
+
+</body>
+</html>
