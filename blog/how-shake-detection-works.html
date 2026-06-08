@@ -18,14 +18,54 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": "How your phone actually knows you&#039;re shaking it (a friendly tour of accelerometers)",
-  "description": "A friendly tour of how your phone knows when you&#039;re shaking it. Inside accelerometers, three-axis motion, and the math that turns gestures into shake-game scores.",
-  "image": "https://shakegasm.com/blog/images/how-shake-detection-works-hero.png",
-  "author": { "@type": "Organization", "name": "ShakeGasm" },
-  "publisher": { "@type": "Organization", "name": "ShakeGasm", "logo": { "@type": "ImageObject", "url": "https://shakegasm.com/icon-512.png" } },
-  "datePublished": "2026-06-01",
-  "mainEntityOfPage": "https://shakegasm.com/blog/how-shake-detection-works.html"
+  "@graph": [
+    {
+      "@type": "Article",
+      "headline": "How your phone actually knows you're shaking it (a friendly tour of accelerometers)",
+      "description": "A friendly tour of how your phone knows when you're shaking it. Inside accelerometers, three-axis motion, and the math that turns gestures into shake-game scores.",
+      "image": "https://shakegasm.com/blog/images/how-shake-detection-works-hero.png",
+      "author": {
+        "@type": "Organization",
+        "name": "ShakeGasm",
+        "url": "https://shakegasm.com/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "ShakeGasm",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://shakegasm.com/icon-512.png"
+        }
+      },
+      "datePublished": "2026-06-01",
+      "dateModified": "2026-06-01",
+      "mainEntityOfPage": "https://shakegasm.com/blog/how-shake-detection-works.html",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://shakegasm.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": "https://shakegasm.com/blog/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "How your phone actually knows you're shaking it (a friendly tour of accelerometers)",
+          "item": "https://shakegasm.com/blog/how-shake-detection-works.html"
+        }
+      ]
+    }
+  ]
 }
 </script>
 
