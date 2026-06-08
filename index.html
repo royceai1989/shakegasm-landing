@@ -23,6 +23,66 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="ShakeGasm">
 <meta name="twitter:description" content="Shake your phone. See what happens. The cheeky party app..">
+<link rel="canonical" href="https://shakegasm.com/">
+
+<!-- Structured data (JSON-LD): Organization + WebSite + the game/app entity +
+     the FAQ. Helps Google understand the brand and the app, and makes the
+     pages eligible for richer search results. -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://shakegasm.com/#org",
+      "name": "ShakeGasm",
+      "url": "https://shakegasm.com/",
+      "logo": "https://shakegasm.com/icon-512.png",
+      "email": "support@shakegasm.com",
+      "description": "ShakeGasm is the shake game — a one-handed reflex party game where you shake your phone to climb five stages and beat your friends."
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://shakegasm.com/#website",
+      "url": "https://shakegasm.com/",
+      "name": "ShakeGasm",
+      "inLanguage": "en",
+      "publisher": { "@id": "https://shakegasm.com/#org" }
+    },
+    {
+      "@type": ["VideoGame", "SoftwareApplication"],
+      "@id": "https://shakegasm.com/#app",
+      "name": "ShakeGasm",
+      "url": "https://shakegasm.com/",
+      "image": "https://shakegasm.com/icon-512.png",
+      "description": "Shake your phone, climb five stages, nail the sweet spot, and beat your friends. A free one-handed reflex party game with voice packs, badges, and shareable scorecards. Plays free in the browser and on Android.",
+      "applicationCategory": "GameApplication",
+      "operatingSystem": "Android, Web",
+      "gamePlatform": ["Android", "Web browser"],
+      "inLanguage": "en",
+      "publisher": { "@id": "https://shakegasm.com/#org" },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://shakegasm.com/#faq",
+      "mainEntity": [
+        { "@type": "Question", "name": "Is this safe to use in public?", "acceptedAnswer": { "@type": "Answer", "text": "Technically yes — the audio is suggestive but not explicit. Practically? Use headphones unless you want to be that person on the train." } },
+        { "@type": "Question", "name": "Do I need an account?", "acceptedAnswer": { "@type": "Answer", "text": "No. Anonymous play works fine. Sign in only if you want your scores, badges, and purchased voices to sync across devices." } },
+        { "@type": "Question", "name": "How do purchases work?", "acceptedAnswer": { "@type": "Answer", "text": "One-time purchases — buy a voice pack once, own it forever. No subscriptions, no recurring fees." } },
+        { "@type": "Question", "name": "Is the Custom Voice Studio creepy?", "acceptedAnswer": { "@type": "Answer", "text": "Your recordings stay on your device — they never touch our servers. We literally cannot listen to them." } },
+        { "@type": "Question", "name": "What's coming next?", "acceptedAnswer": { "@type": "Answer", "text": "An Android app on Google Play with native haptics and Play Billing, iOS later, and more voice packs over time. Send requests to support@shakegasm.com." } },
+        { "@type": "Question", "name": "Can I delete my account?", "acceptedAnswer": { "@type": "Answer", "text": "Yes — one tap inside the app. Your account is recoverable for 30 days, then permanently erased." } }
+      ]
+    }
+  ]
+}
+</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
