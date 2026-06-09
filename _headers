@@ -8,6 +8,13 @@
   Cache-Control: public, max-age=0, must-revalidate
 /*.html
   Cache-Control: public, max-age=0, must-revalidate
+# Extensionless legal pages (Cloudflare serves /privacy & /terms at 200; the
+# /*.html rule above only matches /privacy.html). Without these, edits sit
+# behind the default edge cache and don't revalidate.
+/privacy
+  Cache-Control: public, max-age=0, must-revalidate
+/terms
+  Cache-Control: public, max-age=0, must-revalidate
 /blog/*
   Cache-Control: public, max-age=0, must-revalidate
 /sitemap.xml
