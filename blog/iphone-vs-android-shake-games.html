@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>iPhone vs Android shake games: which phone reacts faster</title>
 <meta name="description" content="iPhone vs Android shake games: iPhone samples sensors at 800 Hz with 10 ms haptics, Android caps at 400 Hz with 30 ms. How ShakeGasm normalizes both.">
-<link rel="canonical" href="https://shakegasm.com/blog/iphone-vs-android-shake-games.html">
+<link rel="canonical" href="https://shakegasm.com/blog/iphone-vs-android-shake-games">
 <meta name="robots" content="index, follow">
 
 <meta property="og:type" content="article">
 <meta property="og:title" content="iPhone vs Android shake games: which phone reacts faster">
 <meta property="og:description" content="iPhone vs Android shake games: iPhone samples sensors at 800 Hz with 10 ms haptics, Android caps at 400 Hz with 30 ms. How ShakeGasm normalizes both.">
-<meta property="og:url" content="https://shakegasm.com/blog/iphone-vs-android-shake-games.html">
+<meta property="og:url" content="https://shakegasm.com/blog/iphone-vs-android-shake-games">
 <meta property="og:image" content="https://shakegasm.com/blog/images/iphone-vs-android-shake-hero-2026-06-03.png">
 <meta name="twitter:card" content="summary_large_image">
 
@@ -39,7 +39,7 @@
       },
       "datePublished": "2026-06-03",
       "dateModified": "2026-06-03",
-      "mainEntityOfPage": "https://shakegasm.com/blog/iphone-vs-android-shake-games.html",
+      "mainEntityOfPage": "https://shakegasm.com/blog/iphone-vs-android-shake-games",
       "inLanguage": "en"
     },
     {
@@ -61,7 +61,7 @@
           "@type": "ListItem",
           "position": 3,
           "name": "iPhone vs Android shake games: which phone reacts faster",
-          "item": "https://shakegasm.com/blog/iphone-vs-android-shake-games.html"
+          "item": "https://shakegasm.com/blog/iphone-vs-android-shake-games"
         }
       ]
     }
@@ -116,7 +116,7 @@
 </figure>
 
 <h2>The sensor specs that decide the score</h2>
-<p>Every shake game reads from the same three sensors, the accelerometer, the gyroscope, and on newer phones a dedicated motion coprocessor. iPhones since the iPhone 12 use the Apple M-series coprocessor, which runs at 1.5 kHz internally and feeds the OS a smoothed signal at 800 Hz. Pixel 8 and Galaxy S24 Ultra use Bosch BMI270 or STMicro LSM6DSO chips, both rated at 1.6 kHz raw but throttled by Android's SensorManager to 400 Hz for battery reasons. The result is that an iPhone catches a 50 ms flick in 40 samples, while a Pixel catches the same flick in 20 samples. That doubles the resolution of the shake curve on iOS, which matters when a shake game scores on peak acceleration within a 100 ms window. Our <a href="https://shakegasm.com/blog/how-shake-detection-works.html">accelerometer explainer</a> covers the three-axis math behind that scoring.</p>
+<p>Every shake game reads from the same three sensors, the accelerometer, the gyroscope, and on newer phones a dedicated motion coprocessor. iPhones since the iPhone 12 use the Apple M-series coprocessor, which runs at 1.5 kHz internally and feeds the OS a smoothed signal at 800 Hz. Pixel 8 and Galaxy S24 Ultra use Bosch BMI270 or STMicro LSM6DSO chips, both rated at 1.6 kHz raw but throttled by Android's SensorManager to 400 Hz for battery reasons. The result is that an iPhone catches a 50 ms flick in 40 samples, while a Pixel catches the same flick in 20 samples. That doubles the resolution of the shake curve on iOS, which matters when a shake game scores on peak acceleration within a 100 ms window. Our <a href="https://shakegasm.com/blog/how-shake-detection-works">accelerometer explainer</a> covers the three-axis math behind that scoring.</p>
 <h2>Taptic Engine vs Android linear motors</h2>
 <p>Apple's Taptic Engine is a linear resonant actuator tuned to 230 Hz, with a latency under 10 ms from API call to physical buzz. Android phones ship a range of motors, the Pixel 8 uses a Z-axis LRA at 170 Hz with 30 ms latency, and the Galaxy S24 Ultra uses a wider-band LRA at 205 Hz with 22 ms latency. Cheaper Android phones, the Galaxy A35 for example, still ship eccentric rotating mass motors at 80 ms latency, which feels like a delayed thud rather than a tight click. In a shake game, that 60 ms gap between a Taptic buzz and an ERM buzz changes how the loop feels by the third round. Players on iPhone report a snappy feedback in 78% of our 240 post-game surveys, while Android users report the same at 41%. The fix on Android is a custom waveform with 3 to 5 short pulses instead of one long buzz, which masks the slower rise time.</p>
 
@@ -138,7 +138,7 @@
 <div class="callout"><p>The 100 ms scoring window is the most important number in cross-platform shake design. Anything tighter punishes Android, anything looser kills the reflex feel on iPhone.</p></div>
 
 <h2>Where each platform wins</h2>
-<p>iPhone wins on raw timing, sample rate, and haptic snap, which makes single-player reflex modes feel tighter. Android wins on screen size variance, the Galaxy S24 Ultra's 6.8 inch panel reads a leaderboard from across a kitchen table in ways a 6.1 inch iPhone cannot. Android also wins on battery during long sessions, a Pixel 8 Pro burns 4% per hour of shake-game play versus the iPhone 15 Pro's 6% per hour, mostly because the iPhone runs the sensor stack harder. For party use across a mixed group, the platform difference matters less than how well the 100 ms scoring window absorbs both. The <a href="https://shakegasm.com/blog/why-phone-reflex-games-feel-so-good.html">phone reflex games breakdown</a> goes deeper on why feedback loops outweigh raw hardware in group play. For competitive 1v1 reflex modes, the iPhone edge is real and worth knowing about.</p>
+<p>iPhone wins on raw timing, sample rate, and haptic snap, which makes single-player reflex modes feel tighter. Android wins on screen size variance, the Galaxy S24 Ultra's 6.8 inch panel reads a leaderboard from across a kitchen table in ways a 6.1 inch iPhone cannot. Android also wins on battery during long sessions, a Pixel 8 Pro burns 4% per hour of shake-game play versus the iPhone 15 Pro's 6% per hour, mostly because the iPhone runs the sensor stack harder. For party use across a mixed group, the platform difference matters less than how well the 100 ms scoring window absorbs both. The <a href="https://shakegasm.com/blog/why-phone-reflex-games-feel-so-good">phone reflex games breakdown</a> goes deeper on why feedback loops outweigh raw hardware in group play. For competitive 1v1 reflex modes, the iPhone edge is real and worth knowing about.</p>
 
 <figure style="margin:32px 0">
   <img src="/blog/images/iphone-vs-android-group-2026-06-03.png" alt="Group of four friends raising mixed iPhones and Android phones overhead in a dim party room with pink LED accent" style="width:100%;border-radius:12px;display:block">
@@ -146,7 +146,7 @@
 </figure>
 
 <h2>How ShakeGasm normalizes both</h2>
-<p>We log every shake event with a platform tag, then apply a 6 ms compensation curve to Android scoring so the leaderboard stays fair across mixed groups. The curve was tuned across 6,200 events and adjusts the magnitude threshold by 4% on phones with sub-400 Hz sensors. Haptic feedback uses a 3-pulse waveform on Android instead of the single iPhone buzz, which our testers ranked 0.8 points higher on a 5-point feel scale. The scoring window stays at 100 ms regardless of platform, which keeps the math simple and the rounds fast. Party hosts running mixed iOS and Android groups get the same leaderboard variance within 7%, tested across 48 sessions. The <a href="https://shakegasm.com/blog/bachelorette-party-phone-shake-games.html">bachelorette shake kit</a> uses this normalized scoring by default so iPhone and Android players land on the same leaderboard.</p>
+<p>We log every shake event with a platform tag, then apply a 6 ms compensation curve to Android scoring so the leaderboard stays fair across mixed groups. The curve was tuned across 6,200 events and adjusts the magnitude threshold by 4% on phones with sub-400 Hz sensors. Haptic feedback uses a 3-pulse waveform on Android instead of the single iPhone buzz, which our testers ranked 0.8 points higher on a 5-point feel scale. The scoring window stays at 100 ms regardless of platform, which keeps the math simple and the rounds fast. Party hosts running mixed iOS and Android groups get the same leaderboard variance within 7%, tested across 48 sessions. The <a href="https://shakegasm.com/blog/bachelorette-party-phone-shake-games">bachelorette shake kit</a> uses this normalized scoring by default so iPhone and Android players land on the same leaderboard.</p>
 
 <div class="cta-inline">
   <div class="cta-inline-title">Test it on your phone</div>
@@ -163,7 +163,7 @@
   <div class="related-section">
     <div class="related-heading">Keep reading</div>
     <div class="related">
-      <a class="related-card" href="/blog/couples-phone-games-for-date-night.html">
+      <a class="related-card" href="/blog/couples-phone-games-for-date-night">
         <div class="related-card-image">
           <img src="/blog/images/couples-date-night-hero-2026-06-01.png" alt="" loading="lazy">
         </div>
@@ -172,7 +172,7 @@
           <div class="related-title">Couples Phone Games for Date Night: 9 Picks Without the Awkward</div>
         </div>
       </a>
-      <a class="related-card" href="/blog/road-trip-phone-games-shake-picks-2026.html">
+      <a class="related-card" href="/blog/road-trip-phone-games-shake-picks-2026">
         <div class="related-card-image">
           <img src="/blog/images/road-trip-phone-games-hero-2026-06-02.png" alt="" loading="lazy">
         </div>
@@ -189,8 +189,8 @@
   © 2026 ShakeGasm ·
   <a href="/">Home</a> ·
   <a href="/blog/">Blog</a> ·
-  <a href="/privacy.html">Privacy</a> ·
-  <a href="/terms.html">Terms</a> ·
+  <a href="/privacy">Privacy</a> ·
+  <a href="/terms">Terms</a> ·
   <a href="https://app.shakegasm.com">Open app</a>
 </footer>
 
