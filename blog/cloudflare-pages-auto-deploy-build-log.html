@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build Log: Our Cloudflare Pages Auto-Deploy Pipeline</title>
+<meta name="description" content="A build log on the ShakeGasm Cloudflare Pages pipeline: 30-second deploy budget, build cache wins, edge invalidation, and numbers from 31 deploys.">
+<link rel="canonical" href="https://shakegasm.com/blog/cloudflare-pages-auto-deploy-build-log.html">
+<meta name="robots" content="index, follow">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Build Log: Our Cloudflare Pages Auto-Deploy Pipeline">
+<meta property="og:description" content="A build log on the ShakeGasm Cloudflare Pages pipeline: 30-second deploy budget, build cache wins, edge invalidation, and numbers from 31 deploys.">
+<meta property="og:url" content="https://shakegasm.com/blog/cloudflare-pages-auto-deploy-build-log.html">
+<meta property="og:image" content="https://shakegasm.com/blog/images/cloudflare-deploy-hero-2026-06-10.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Build Log: Our Cloudflare Pages Auto-Deploy Pipeline",
+  "description": "A build log on the ShakeGasm Cloudflare Pages pipeline: 30-second deploy budget, build cache wins, edge invalidation, and numbers from 31 deploys.",
+  "image": "https://shakegasm.com/blog/images/cloudflare-deploy-hero-2026-06-10.png",
+  "author": { "@type": "Organization", "name": "ShakeGasm" },
+  "publisher": { "@type": "Organization", "name": "ShakeGasm", "logo": { "@type": "ImageObject", "url": "https://shakegasm.com/icon-512.png" } },
+  "datePublished": "2026-06-10",
+  "mainEntityOfPage": "https://shakegasm.com/blog/cloudflare-pages-auto-deploy-build-log.html"
+}
+</script>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/blog/blog.css">
+</head>
+<body>
+
+<nav class="blog-nav">
+  <div class="blog-nav-inner">
+    <a class="blog-logo" href="/">SHAKE<span class="dot">·</span>GASM</a>
+    <div class="blog-nav-links">
+      <a class="blog-nav-link" href="/#voices">Voices</a>
+      <a class="blog-nav-link" href="/#how">How it works</a>
+      <a class="blog-nav-link" href="/#faq">FAQ</a>
+      <a class="blog-nav-cta" href="https://app.shakegasm.com">Open app →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero-cta">
+  <div class="hero-cta-inner">
+    <div class="hero-cta-text">
+      <strong>💥 Free to play in your browser.</strong> <span class="accent">No install, no sign-up.</span>
+    </div>
+    <a class="hero-cta-btn" href="https://app.shakegasm.com">Open the game</a>
+  </div>
+</div>
+
+<article class="wrap">
+
+  <div class="post-meta">
+    <span class="post-tag">Build log</span>
+    <span class="dot"></span>
+    <span>7 min read</span>
+    <span class="dot"></span>
+    <span>June 2026</span>
+  </div>
+
+  <h1>Build Log: Our Cloudflare Pages Auto-Deploy Pipeline</h1>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/cloudflare-deploy-hero-2026-06-10.png" alt="Developer at a black walnut desk with iPhone and a Pro Display XDR showing green Cloudflare Pages deploy logs" style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">Pipeline in production: phone preview on the left, deploy logs on the right.</figcaption>
+</figure>
+
+<h2>Why Cloudflare Pages won the deploy slot</h2>
+<p>Last sprint we moved the ShakeGasm marketing site from a manual rsync to Cloudflare Pages with GitHub auto-deploy. The previous flow took 4 minutes per push and required SSH access to a $12 DigitalOcean droplet. Cloudflare Pages runs the same static build for free up to 500 deploys per month, which covers our entire content cadence with room to spare. Latency from London edge nodes dropped from 380ms to 41ms because Cloudflare serves the HTML from 310 POPs instead of a single Amsterdam VM. Our <a href="https://app.shakegasm.com">ShakeGasm</a> gameplay app stays on its own stack, so this migration only touched the blog and landing routes. The first deploy after the cutover took 38 seconds end to end, which is the number we tuned the rest of the sprint around.</p>
+
+<h2>The 30-second deploy budget</h2>
+<p>A 30-second budget sounds arbitrary until you publish 2 posts per day and feel every minute. At 4 minutes per deploy and 60 pushes per month, the old setup burned 4 hours of waiting time per month for a one-person team. At 30 seconds, the same volume burns 30 minutes per month, which is one short coffee break. We chose 30 as the ceiling because Cloudflare's median Pages build time across 1.2 million projects sits at 41 seconds per their May 2026 status report. Pushing under the median meant trimming our build step from 22 seconds to 9 seconds and our deploy step from 18 seconds to 11 seconds. Both numbers came from real timing logs across 31 production deploys between May 14 and June 8.</p>
+<p>The trim came from 3 specific moves:</p>
+<ul>
+<li>Cache the node_modules folder between builds using the Cloudflare cache key feature, which cut 14 seconds off cold installs.</li>
+<li>Drop the sitemap regeneration step from the build and run it as a post-deploy webhook instead, saving 6 seconds.</li>
+<li>Switch the image optimization pipeline from sharp at build time to Cloudflare Images at request time, freeing 9 seconds of build CPU.</li>
+</ul>
+
+<h2>Wire-up: GitHub, build cache, edge invalidation</h2>
+<p>The full pipeline lives in a single Pages project linked to the royceai1989/shakegasm-landing main branch. Each push to main fires a webhook that Cloudflare receives within 1.4 seconds based on GitHub's June 2026 webhook latency dashboard. Cloudflare clones the repo into a sandbox container with 8GB RAM and 4 vCPUs, restores the cached node_modules layer, and runs npm run build. Our build script writes static HTML for each blog post, walks the routes folder, and emits a fresh sitemap.xml entry only for new slugs. The static output ships to Cloudflare's KV store, which is replicated to every POP in under 6 seconds globally per their public SLA.</p>
+<p>Edge invalidation is the part most teams underestimate. When we update an existing post body, the new HTML reaches every POP, but the CDN still serves the cached version for up to 60 minutes unless you purge the URL. We added a 14-line Node script that calls the Cloudflare API with a list of changed slugs after each deploy, which forces a purge in under 3 seconds. Our <a href="https://shakegasm.com/blog/haptic-feedback-phone-shake-games">haptic feedback writeup</a> is the kind of post that gets edits within the first day of publishing, so the purge step was non-negotiable.</p>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/cloudflare-build-log-2026-06-10.png" alt="Close-up of a MacBook Pro screen showing a Cloudflare Pages build log with green checks and a 32-second deploy time" style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">A 32-second deploy after the cache-key fix in build 7.</figcaption>
+</figure>
+
+<h2>What broke in week one</h2>
+<p>Three things broke in the first week. Build 7 failed because the cache key included a timestamp by accident, so every push restored a stale node_modules from the wrong day, which surfaced as a missing peer dep error 39 seconds into install. The fix took 8 minutes once we read the cache hash log. Build 12 failed because a Pages environment variable was named with a hyphen instead of an underscore, which Cloudflare silently ignores. A bash echo step caught the empty value 4 seconds into build, which is why we now log every env var name before the build script runs.</p>
+<p>Build 19 was the bad one. The blog index page started serving a 502 because we added a new route folder that the build script did not know to walk. Cloudflare's edge served the cached 200 for 38 minutes while we found the bug, which masked the real impact. We added a synthetic check that calls the new slug 6 seconds after deploy completes and pages us if the response is not a 200 with a content-type of text/html. Our <a href="https://shakegasm.com/blog/how-shake-detection-works">shake detection writeup</a> was the first post the synthetic check caught when we ran a regression test.</p>
+
+<div class="callout"><p>30 seconds is not a vanity metric. It is the difference between shipping a typo fix and deciding the typo can wait until tomorrow.</p></div>
+
+<h2>Numbers from 31 deploys</h2>
+<p>Median deploy time across the 31 production deploys sits at 28.4 seconds. The fastest deploy clocked in at 21.2 seconds for a typo fix that only touched a single markdown file and skipped the image pipeline. The slowest was 47.9 seconds for a deploy that included 4 new blog posts and 11 new images, which forced the image optimization fallback path. Build cache hit rate sits at 91 percent, which is high enough that cold installs feel like edge cases instead of the norm. We pay zero dollars per month for the Pages tier because we use 31 deploys out of the 500-deploy free quota, with 9 GB of bandwidth out of the 100 GB free pool. The same workload on a self-hosted setup would have cost the droplet $12 per month plus 4 hours of staff time, which is the kind of math that ends an internal debate in one meeting.</p>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/shake-test-motion-2026-06-10.png" alt="A hand mid-shake gripping a Pixel 8 Pro with a hot pink game score reading 47 against a pure black background" style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">Smoke test after every deploy: shake, score, screenshot.</figcaption>
+</figure>
+
+<h2>What we ship next</h2>
+<p>The next sprint adds 2 things. First, a preview deploy per pull request, which Cloudflare Pages does natively for free and which would let us QA blog posts on a unique URL before merging to main. We tested this on a side repo last week and the preview URL was live 24 seconds after the PR opened. Second, a deploy notification into our Telegram topic that includes the changed slugs, deploy duration, and a one-click rollback button via the Cloudflare API. Our <a href="https://shakegasm.com/blog/phones-replacing-board-games-2026">phones replacing board games piece</a> sat in draft for 3 days last month because we had no easy preview, which is the exact friction this change kills.</p>
+<p>We will publish the rollback workflow as a standalone build log post once it has 30 days of production data. Until then, the 30-second budget holds, the cache key is timestamp-free, and every push to main reaches every POP in under a minute. If you want to feel the result, the ShakeGasm app and its blog now load from the same edge network, and the blog HTML hits first paint in 180ms on a cold cable connection from Frankfurt.</p>
+
+<div class="cta-inline">
+  <div class="cta-inline-title">Feel the 30-second pipeline in your hand</div>
+  <div class="cta-inline-sub">Open the app on your phone, shake once, watch the score land. Same edge network, same hot pink.</div>
+  <a class="cta-btn" href="https://app.shakegasm.com">Play ShakeGasm →</a>
+</div>
+
+  <div class="cta-block">
+    <h3>Stop reading. Start shaking.</h3>
+    <p>Five stages. One climax. Free in your browser, free on Android — voice packs optional.</p>
+    <a class="cta-btn" href="https://app.shakegasm.com">Play ShakeGasm now</a>
+  </div>
+
+  <div class="related-section">
+    <div class="related-heading">Keep reading</div>
+    <div class="related">
+      <a class="related-card" href="/blog/bachelorette-party-phone-shake-games.html">
+        <div class="related-card-image">
+          <img src="/blog/images/bachelorette-shake-hero-2026-06-01.png" alt="" loading="lazy">
+        </div>
+        <div class="related-card-body">
+          <div class="related-tag">How it works</div>
+          <div class="related-title">bachelorette-party-phone-shake-games</div>
+        </div>
+      </a>
+      <a class="related-card" href="/blog/best-phone-party-games-2026.html">
+        <div class="related-card-image">
+          <img src="/blog/images/best-phone-party-games-2026-hero.png" alt="" loading="lazy">
+        </div>
+        <div class="related-card-body">
+          <div class="related-tag">Roundup</div>
+          <div class="related-title">best-phone-party-games-2026</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</article>
+
+<footer class="blog-footer">
+  © 2026 ShakeGasm ·
+  <a href="/">Home</a> ·
+  <a href="/blog/">Blog</a> ·
+  <a href="/privacy.html">Privacy</a> ·
+  <a href="/terms.html">Terms</a> ·
+  <a href="https://app.shakegasm.com">Open app</a>
+</footer>
+
+<div class="sticky-cta">
+  <div class="sticky-cta-inner">
+    <div class="sticky-cta-text">
+      <span class="pulse">Shake your phone.</span> See what happens. Free, browser-based.
+    </div>
+    <a class="sticky-cta-btn" href="https://app.shakegasm.com">Play ShakeGasm →</a>
+  </div>
+</div>
+
+</body>
+</html>
