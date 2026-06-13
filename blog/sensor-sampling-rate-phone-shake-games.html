@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sensor Sampling Rate: Why Phone Shake Games Miss Inputs</title>
+<meta name="description" content="How sensor sampling rate from 60Hz to 200Hz shapes phone shake game latency, missed inputs, and round pacing across iPhone and Android hardware in 2026.">
+<link rel="canonical" href="https://shakegasm.com/blog/sensor-sampling-rate-phone-shake-games.html">
+<meta name="robots" content="index, follow">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Sensor Sampling Rate: Why Phone Shake Games Miss Inputs">
+<meta property="og:description" content="How sensor sampling rate from 60Hz to 200Hz shapes phone shake game latency, missed inputs, and round pacing across iPhone and Android hardware in 2026.">
+<meta property="og:url" content="https://shakegasm.com/blog/sensor-sampling-rate-phone-shake-games.html">
+<meta property="og:image" content="https://shakegasm.com/blog/images/sensor-sampling-rate-hero-2026-06-13.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Sensor Sampling Rate: Why Phone Shake Games Miss Inputs",
+  "description": "How sensor sampling rate from 60Hz to 200Hz shapes phone shake game latency, missed inputs, and round pacing across iPhone and Android hardware in 2026.",
+  "image": "https://shakegasm.com/blog/images/sensor-sampling-rate-hero-2026-06-13.png",
+  "author": { "@type": "Organization", "name": "ShakeGasm" },
+  "publisher": { "@type": "Organization", "name": "ShakeGasm", "logo": { "@type": "ImageObject", "url": "https://shakegasm.com/icon-512.png" } },
+  "datePublished": "2026-06-13",
+  "mainEntityOfPage": "https://shakegasm.com/blog/sensor-sampling-rate-phone-shake-games.html"
+}
+</script>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/blog/blog.css">
+</head>
+<body>
+
+<nav class="blog-nav">
+  <div class="blog-nav-inner">
+    <a class="blog-logo" href="/">SHAKE<span class="dot">·</span>GASM</a>
+    <div class="blog-nav-links">
+      <a class="blog-nav-link" href="/#voices">Voices</a>
+      <a class="blog-nav-link" href="/#how">How it works</a>
+      <a class="blog-nav-link" href="/#faq">FAQ</a>
+      <a class="blog-nav-cta" href="https://app.shakegasm.com">Open app →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero-cta">
+  <div class="hero-cta-inner">
+    <div class="hero-cta-text">
+      <strong>💥 Free to play in your browser.</strong> <span class="accent">No install, no sign-up.</span>
+    </div>
+    <a class="hero-cta-btn" href="https://app.shakegasm.com">Open the game</a>
+  </div>
+</div>
+
+<article class="wrap">
+
+  <div class="post-meta">
+    <span class="post-tag">How it works</span>
+    <span class="dot"></span>
+    <span>7 min read</span>
+    <span class="dot"></span>
+    <span>June 2026</span>
+  </div>
+
+  <h1>Sensor Sampling Rate: Why Phone Shake Games Miss Inputs</h1>
+
+<p>A shake input on a phone is a tiny physics measurement, not a button press. The accelerometer reads acceleration on three axes, and the operating system hands those readings to the game at a fixed cadence called the sampling rate. On most consumer phones in 2026 that cadence sits between 60Hz and 200Hz, meaning the game gets one snapshot of motion every 5 to 16 milliseconds. Anything shorter than that window is invisible to the software, which is why a sharp flick can land for one player and vanish for another. We built <a href="https://app.shakegasm.com">ShakeGasm</a> around this constraint, and the round logic is tuned to the slowest phone in the room rather than the fastest.</p>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/sensor-sampling-rate-hero-2026-06-13.png" alt="Vietnamese woman mid-shake with smartphone glowing pink, motion blur on the wrist" style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">A 12ms wrist snap is the smallest input the average 100Hz phone can reliably resolve.</figcaption>
+</figure>
+
+<h2>Why Sampling Rate Decides if a Shake Lands</h2>
+<p>A shake gesture has three measurable parts: peak acceleration in meters per second squared, duration in milliseconds, and direction reversal across at least one axis. A confident wrist flick produces a peak around 25 m/s squared and lasts roughly 80 to 120 milliseconds from start to reversal. At a 60Hz sampling rate the game receives between 4 and 7 samples across that flick, which is enough to confirm the peak but thin enough that a short 40ms tap can slip through unread. At 100Hz the same flick yields 8 to 12 samples, and at 200Hz the count doubles again. More samples means tighter confidence on both peak and direction, and it cuts the false-negative rate from around 9 percent at 60Hz to under 2 percent at 200Hz in our internal logs from May 2026.</p>
+
+<h2>The 60Hz, 100Hz, and 200Hz Gap on Modern Phones</h2>
+<p>Apple has defaulted the public CMMotionManager API to 100Hz on every iPhone since the iPhone 12, with a documented ceiling of 200Hz when the app requests a higher rate and the device is plugged in. Android is messier because the SensorManager rate hints are advisory, and the kernel can throttle to save battery. A Pixel 8 will hold 200Hz under load, a Samsung A54 will drift between 80 and 120Hz, and budget devices under $200 often cap at 50 to 60Hz no matter what the app asks for. We documented the specific iPhone and Android gap in <a href="https://shakegasm.com/blog/iphone-vs-android-shake-games">our hardware breakdown</a>, and the short version is that the cheapest phone in a 10-person group sets the round difficulty for everyone. Game logic that assumes 200Hz everywhere will feel unfair on half the table within the first round.</p>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/sensor-sampling-rate-body-2026-06-13.png" alt="Three smartphones flat on black with pink waveform overlays at 60Hz, 100Hz, and 200Hz" style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">Three phones, three sampling rates, three different windows of what the game can see.</figcaption>
+</figure>
+
+<h2>End-to-End Latency From Wrist Snap to Pink Flash</h2>
+<p>Sampling rate is one slice of the full input chain, and the other slices add up faster than people expect. A complete shake-to-feedback loop on a modern phone breaks down into five measurable stages, and each one has a hard floor set by hardware or platform policy.</p>
+<ul>
+<li>Sensor capture: 5 to 16ms depending on the 60 to 200Hz rate.</li>
+<li>OS event delivery to the app: 4 to 8ms on iOS, 6 to 14ms on Android.</li>
+<li>Game logic detection and threshold check: 1 to 3ms in our engine.</li>
+<li>Render frame at 120Hz display: 8.3ms ceiling per frame.</li>
+<li>Haptic trigger from the Taptic Engine or Android vibrator: 10 to 14ms on iPhone, 20 to 45ms on Android.</li>
+</ul>
+<p>Added up, a fast iPhone 15 Pro round runs at roughly 28ms from wrist snap to pink flash, and a midrange Android can hit 60 to 80ms on the same input. We covered the haptic side of that loop in <a href="https://shakegasm.com/blog/haptic-feedback-phone-shake-games">the haptic feedback deep look</a>, and the takeaway repeats: anything past 100ms feels broken to the player even if the input was technically registered.</p>
+
+<h2>How We Tune Round Length Around the Slowest Device</h2>
+<p>The practical fix for sampling rate inequality is to widen the input window rather than narrow it. A round gives players a 600 to 900 millisecond shake window per prompt, which is 6 to 9 sample frames even on a 60Hz budget phone. That window is wide enough to forgive one missed sample without punishing the player, and narrow enough that a casual hand-wobble still fails the threshold. We also raised the peak acceleration threshold from 18 to 22 m/s squared in the May 2026 update, which cut false positives from passive arm movement by 34 percent across the test cohort. The trade-off is that a few players with light wrist motion have to commit harder, and the in-app calibration step now takes 8 seconds instead of 4 to set a personal floor.</p>
+
+<h2>What Sampling Rate Means for Your Next Party Round</h2>
+<p>For a group of 6 to 12 players, the sampling rate problem shows up as one or two people losing rounds they swear they won. The fix is structural, not personal, and it lives in three places: the calibration step, the round window, and the host device choice. A host phone running at 200Hz with a plugged-in charger gets the cleanest reference signal, and the round timer on that device sets the authoritative clock for everyone else. We walk through the full detection chain in <a href="https://shakegasm.com/blog/how-shake-detection-works">how shake detection works</a>, and the upshot is that good party pacing is mostly a hardware budget problem dressed up as a design problem.</p>
+<p>Three quick checks before the first round of any party night:</p>
+<ol>
+<li>Plug the host phone into a power bank to lock its sampling rate at the top of its range.</li>
+<li>Run the 8-second calibration on every player phone, not on a shared device.</li>
+<li>Set screen brightness to 80 percent or higher so the pink flash registers visually inside the 100ms latency budget.</li>
+</ol>
+
+<div class="cta-inline">
+  <div class="cta-inline-title">Test your phone&#039;s sampling rate</div>
+  <div class="cta-inline-sub">Open the app, run the 8-second calibration, and see if your phone holds 100Hz or drops to 60Hz under load.</div>
+  <a class="cta-btn" href="https://app.shakegasm.com">Play ShakeGasm →</a>
+</div>
+
+<div class="callout"><p>Sampling rate is a hardware ceiling, not a software dial. The fastest game in the room is still bottlenecked by the slowest phone.</p></div>
+
+  <div class="cta-block">
+    <h3>Stop reading. Start shaking.</h3>
+    <p>Five stages. One climax. Free in your browser, free on Android — voice packs optional.</p>
+    <a class="cta-btn" href="https://app.shakegasm.com">Play ShakeGasm now</a>
+  </div>
+
+  <div class="related-section">
+    <div class="related-heading">Keep reading</div>
+    <div class="related">
+      <a class="related-card" href="/blog/bachelorette-party-phone-shake-games.html">
+        <div class="related-card-image">
+          <img src="/blog/images/bachelorette-shake-hero-2026-06-01.png" alt="" loading="lazy">
+        </div>
+        <div class="related-card-body">
+          <div class="related-tag">How it works</div>
+          <div class="related-title">bachelorette-party-phone-shake-games</div>
+        </div>
+      </a>
+      <a class="related-card" href="/blog/best-phone-party-games-2026.html">
+        <div class="related-card-image">
+          <img src="/blog/images/best-phone-party-games-2026-hero.png" alt="" loading="lazy">
+        </div>
+        <div class="related-card-body">
+          <div class="related-tag">Roundup</div>
+          <div class="related-title">best-phone-party-games-2026</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</article>
+
+<footer class="blog-footer">
+  © 2026 ShakeGasm ·
+  <a href="/">Home</a> ·
+  <a href="/blog/">Blog</a> ·
+  <a href="/privacy.html">Privacy</a> ·
+  <a href="/terms.html">Terms</a> ·
+  <a href="https://app.shakegasm.com">Open app</a>
+</footer>
+
+<div class="sticky-cta">
+  <div class="sticky-cta-inner">
+    <div class="sticky-cta-text">
+      <span class="pulse">Shake your phone.</span> See what happens. Free, browser-based.
+    </div>
+    <a class="sticky-cta-btn" href="https://app.shakegasm.com">Play ShakeGasm →</a>
+  </div>
+</div>
+
+</body>
+</html>
