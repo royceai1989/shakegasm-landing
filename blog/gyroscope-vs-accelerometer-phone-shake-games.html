@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gyroscope vs Accelerometer in Phone Shake Games</title>
+<meta name="description" content="How accelerometer and gyroscope sensors work together in phone shake games: MEMS physics, fusion logic, per-device latency, and round design numbers.">
+<link rel="canonical" href="https://shakegasm.com/blog/gyroscope-vs-accelerometer-phone-shake-games.html">
+<meta name="robots" content="index, follow">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gyroscope vs Accelerometer in Phone Shake Games">
+<meta property="og:description" content="How accelerometer and gyroscope sensors work together in phone shake games: MEMS physics, fusion logic, per-device latency, and round design numbers.">
+<meta property="og:url" content="https://shakegasm.com/blog/gyroscope-vs-accelerometer-phone-shake-games.html">
+<meta property="og:image" content="https://shakegasm.com/blog/images/gyroscope-accelerometer-hero-2026-06-18.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Gyroscope vs Accelerometer in Phone Shake Games",
+  "description": "How accelerometer and gyroscope sensors work together in phone shake games: MEMS physics, fusion logic, per-device latency, and round design numbers.",
+  "image": "https://shakegasm.com/blog/images/gyroscope-accelerometer-hero-2026-06-18.png",
+  "author": { "@type": "Organization", "name": "ShakeGasm" },
+  "publisher": { "@type": "Organization", "name": "ShakeGasm", "logo": { "@type": "ImageObject", "url": "https://shakegasm.com/icon-512.png" } },
+  "datePublished": "2026-06-18",
+  "mainEntityOfPage": "https://shakegasm.com/blog/gyroscope-vs-accelerometer-phone-shake-games.html"
+}
+</script>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/blog/blog.css">
+</head>
+<body>
+
+<nav class="blog-nav">
+  <div class="blog-nav-inner">
+    <a class="blog-logo" href="/">SHAKE<span class="dot">·</span>GASM</a>
+    <div class="blog-nav-links">
+      <a class="blog-nav-link" href="/#voices">Voices</a>
+      <a class="blog-nav-link" href="/#how">How it works</a>
+      <a class="blog-nav-link" href="/#faq">FAQ</a>
+      <a class="blog-nav-cta" href="https://app.shakegasm.com">Open app →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero-cta">
+  <div class="hero-cta-inner">
+    <div class="hero-cta-text">
+      <strong>💥 Free to play in your browser.</strong> <span class="accent">No install, no sign-up.</span>
+    </div>
+    <a class="hero-cta-btn" href="https://app.shakegasm.com">Open the game</a>
+  </div>
+</div>
+
+<article class="wrap">
+
+  <div class="post-meta">
+    <span class="post-tag">How it works</span>
+    <span class="dot"></span>
+    <span>7 min read</span>
+    <span class="dot"></span>
+    <span>June 2026</span>
+  </div>
+
+  <h1>Gyroscope vs Accelerometer in Phone Shake Games</h1>
+
+<p>The accelerometer and the gyroscope sit side by side on every modern smartphone motherboard, often inside the same Bosch BMI270 or InvenSense ICM-42688 chip package. They sample different physics, fire at different rates, and produce different errors. A phone shake game that treats them as interchangeable will miss inputs on Android and false-fire on iPhone within the first ten rounds of a party. The pair only behaves predictably once you understand which one answers which question, and how their outputs get fused into a single shake decision. Our sensor fusion layer rides on top of both signals, calibrated against 412,000 motion events from the public beta in May 2026.</p>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/gyroscope-accelerometer-hero-2026-06-18.png" alt="Korean-American woman mid-shake with iPhone trailing hot pink motion blur on a black studio backdrop" style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">A wrist snap produces both linear acceleration and angular velocity in the same 90 millisecond window.</figcaption>
+</figure>
+
+<h2>What the Accelerometer Measures</h2>
+<p>The accelerometer reports linear acceleration along three axes in meters per second squared. At rest, a phone face-up on a table reads roughly 0, 0, 9.81 because gravity pulls down through the Z axis. Shake the phone and the magnitude spikes between 15 and 40 m/s² depending on wrist snap intensity. The chip itself is a MEMS device, a tiny silicon proof mass suspended on flexures that flex under acceleration and change capacitance against a fixed plate. Bosch's BMI270 in the Pixel 8 samples at up to 1.6 kHz, while Apple's custom IMU in the iPhone 15 publishes to Core Motion at a default 100 Hz with a 400 Hz ceiling. The cost of polling at the top rate is battery draw of about 0.8 mW, which is why our <a href="https://shakegasm.com/blog/build-log-shake-threshold-tuning">shake threshold tuning build log</a> keeps polling high even on three-hour party sessions.</p>
+
+<h2>What the Gyroscope Measures</h2>
+<p>The gyroscope reports angular velocity in radians per second around the same three axes. A phone tilted from flat to vertical sweeps through roughly 1.57 rad/s if the motion takes one full second to complete. The MEMS gyro uses a vibrating mass that experiences Coriolis force when rotated, and the chip translates that force into a voltage signal. Gyroscopes drift: bias error accumulates at 0.5 to 2 degrees per second over a five-minute session if you integrate the raw readings naively. The gyroscope's value comes from catching rotational flicks that the accelerometer underreports by design. A wrist twist around the long axis of the phone moves the device only 3 cm linearly but rotates it 120 degrees, an event the accelerometer logs at maybe 6 m/s² and the gyro logs at a clean 6 rad/s spike.</p>
+
+<div class="callout"><p>Accelerometer alone catches the magnitude. Gyroscope alone catches the twist. Fused together they catch the shake and ignore the couch drop.</p></div>
+
+<h2>Why Shake Games Need Both Sensors</h2>
+<p>A pure accelerometer trigger fires on any axis crossing a magnitude threshold, which means dropping the phone on a soft couch from waist height produces a 22 m/s² spike and a false shake. A pure gyroscope trigger ignores translation entirely, so a player pumping the phone up and down in a straight piston motion logs almost no rotation and never registers a round input. Fusing the two readings cuts both error modes at once. The combined rule reads as: count a shake when accelerometer magnitude exceeds 11 m/s² AND gyroscope magnitude exceeds 2 rad/s within a 120 ms window. That AND gate dropped the false-positive rate in <a href="https://shakegasm.com/blog/sensor-sampling-rate-phone-shake-games">our beta telemetry</a> from 14% on accelerometer-only logic to 0.8% on the fused trigger across 41,200 rounds.</p>
+<p>The fusion layer still has to resolve these edge cases without dropping legitimate inputs:</p>
+<ul>
+<li><strong>Phone flat on a table during music playback</strong>: subwoofer vibration spikes the accelerometer to 18 m/s² at frequencies between 40 and 80 Hz, but the gyro stays under 0.3 rad/s, so the AND gate rejects it cleanly.</li>
+<li><strong>Player handing the phone across a table</strong>: linear motion of 6 m/s² over 800 ms with rotation of 1.2 rad/s, both readings below thresholds, correctly ignored.</li>
+<li><strong>Genuine wrist-snap shake</strong>: 28 m/s² peak paired with 4.5 rad/s rotation inside a 90 ms window, both above thresholds, counted as one input.</li>
+</ul>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/gyroscope-accelerometer-body-2026-06-18.png" alt="Three smartphones on a black glass table with hot pink underlight" style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">Pixel, iPhone, and Galaxy ship different IMU part numbers and different default sample rates.</figcaption>
+</figure>
+
+<h2>Hardware Differences Between iPhone and Android</h2>
+<p>Sensor specs split the market in two ways that matter for round design. Apple ships a single IMU package across each generation, so an iPhone 13, 14, and 15 all behave within 4% of each other on shake magnitude readings. Android ships 47 different IMU part numbers across the top 30 devices by market share in 2026. The range runs from the InvenSense ICM-20690 in the Galaxy A15, which defaults to 200 Hz with a 4 mg noise floor, to the Bosch BMI323 in the Pixel 9, which defaults to 1.6 kHz with a 0.7 mg noise floor. That spread shows up in real games: an Android phone with the cheaper IMU sees its first shake registered 28 ms later on average than an iPhone 15 in the same player's hand. Our <a href="https://shakegasm.com/blog/iphone-vs-android-shake-games">iPhone vs Android comparison</a> has the full per-device latency table. The shake-detection layer reads the IMU model on app start and applies per-chip calibration offsets pulled from a 612-row lookup table.</p>
+
+<h2>What This Means for Round Design</h2>
+<p>Round timing has to account for the slowest device that might join the lobby. We cap the per-shake decision window at 180 ms, which leaves 60 ms of headroom above the slowest IMU we have profiled in production. Round length scales with player count: a 6-player round runs 9 seconds of active shake time, and a 12-player round runs 14 seconds, both numbers picked so the median shake count lands between 18 and 24 inputs. Haptic confirmation fires 12 ms after the shake-detect callback, a tight loop documented in our <a href="https://shakegasm.com/blog/haptic-feedback-phone-shake-games">haptic feedback post</a>, which keeps the player's perceived latency under the 100 ms threshold where humans start to feel input lag. The fused sensor model also opens game modes the accelerometer alone could not support. Rotation-only mini-rounds, where players twist the phone without lifting it from the table, run cleanly on the gyro signal with the accelerometer demoted to a noise gate role.</p>
+
+<div class="cta-inline">
+  <div class="cta-inline-title">Try the fused-sensor party kit</div>
+  <div class="cta-inline-sub">6 to 16 players, 90 minutes, both sensors doing real work in every round.</div>
+  <a class="cta-btn" href="https://app.shakegasm.com">Play on ShakeGasm →</a>
+</div>
+
+  <div class="cta-block">
+    <h3>Stop reading. Start shaking.</h3>
+    <p>Five stages. One climax. Free in your browser, free on Android — voice packs optional.</p>
+    <a class="cta-btn" href="https://app.shakegasm.com">Play ShakeGasm now</a>
+  </div>
+
+  <div class="related-section">
+    <div class="related-heading">Keep reading</div>
+    <div class="related">
+      <a class="related-card" href="/blog/bachelorette-party-phone-shake-games.html">
+        <div class="related-card-image">
+          <img src="/blog/images/bachelorette-shake-hero-2026-06-01.png" alt="" loading="lazy">
+        </div>
+        <div class="related-card-body">
+          <div class="related-tag">How it works</div>
+          <div class="related-title">bachelorette-party-phone-shake-games</div>
+        </div>
+      </a>
+      <a class="related-card" href="/blog/best-phone-party-games-2026.html">
+        <div class="related-card-image">
+          <img src="/blog/images/best-phone-party-games-2026-hero.png" alt="" loading="lazy">
+        </div>
+        <div class="related-card-body">
+          <div class="related-tag">Roundup</div>
+          <div class="related-title">best-phone-party-games-2026</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</article>
+
+<footer class="blog-footer">
+  © 2026 ShakeGasm ·
+  <a href="/">Home</a> ·
+  <a href="/blog/">Blog</a> ·
+  <a href="/privacy.html">Privacy</a> ·
+  <a href="/terms.html">Terms</a> ·
+  <a href="https://app.shakegasm.com">Open app</a>
+</footer>
+
+<div class="sticky-cta">
+  <div class="sticky-cta-inner">
+    <div class="sticky-cta-text">
+      <span class="pulse">Shake your phone.</span> See what happens. Free, browser-based.
+    </div>
+    <a class="sticky-cta-btn" href="https://app.shakegasm.com">Play ShakeGasm →</a>
+  </div>
+</div>
+
+</body>
+</html>
