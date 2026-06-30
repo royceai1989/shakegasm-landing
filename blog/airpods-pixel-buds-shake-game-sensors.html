@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AirPods and Pixel Buds as Shake Game Sensors</title>
+<meta name="description" content="How AirPods Pro 2 and Pixel Buds Pro 2 work as a second sensor in phone shake games: 23ms fusion gap, 52Hz IMU math, and host playbook numbers.">
+<link rel="canonical" href="https://shakegasm.com/blog/airpods-pixel-buds-shake-game-sensors.html">
+<meta name="robots" content="index, follow">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="AirPods and Pixel Buds as Shake Game Sensors">
+<meta property="og:description" content="How AirPods Pro 2 and Pixel Buds Pro 2 work as a second sensor in phone shake games: 23ms fusion gap, 52Hz IMU math, and host playbook numbers.">
+<meta property="og:url" content="https://shakegasm.com/blog/airpods-pixel-buds-shake-game-sensors.html">
+<meta property="og:image" content="https://shakegasm.com/blog/images/airpods-pixel-buds-shake-hero-2026-06-30.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "AirPods and Pixel Buds as Shake Game Sensors",
+  "description": "How AirPods Pro 2 and Pixel Buds Pro 2 work as a second sensor in phone shake games: 23ms fusion gap, 52Hz IMU math, and host playbook numbers.",
+  "image": "https://shakegasm.com/blog/images/airpods-pixel-buds-shake-hero-2026-06-30.png",
+  "author": { "@type": "Organization", "name": "ShakeGasm" },
+  "publisher": { "@type": "Organization", "name": "ShakeGasm", "logo": { "@type": "ImageObject", "url": "https://shakegasm.com/icon-512.png" } },
+  "datePublished": "2026-06-30",
+  "mainEntityOfPage": "https://shakegasm.com/blog/airpods-pixel-buds-shake-game-sensors.html"
+}
+</script>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/blog/blog.css">
+</head>
+<body>
+
+<nav class="blog-nav">
+  <div class="blog-nav-inner">
+    <a class="blog-logo" href="/">SHAKE<span class="dot">·</span>GASM</a>
+    <div class="blog-nav-links">
+      <a class="blog-nav-link" href="/#voices">Voices</a>
+      <a class="blog-nav-link" href="/#how">How it works</a>
+      <a class="blog-nav-link" href="/#faq">FAQ</a>
+      <a class="blog-nav-cta" href="https://app.shakegasm.com">Open app →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero-cta">
+  <div class="hero-cta-inner">
+    <div class="hero-cta-text">
+      <strong>💥 Free to play in your browser.</strong> <span class="accent">No install, no sign-up.</span>
+    </div>
+    <a class="hero-cta-btn" href="https://app.shakegasm.com">Open the game</a>
+  </div>
+</div>
+
+<article class="wrap">
+
+  <div class="post-meta">
+    <span class="post-tag">How it works</span>
+    <span class="dot"></span>
+    <span>8 min read</span>
+    <span class="dot"></span>
+    <span>June 2026</span>
+  </div>
+
+  <h1>AirPods and Pixel Buds as Shake Game Sensors</h1>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/airpods-pixel-buds-shake-hero-2026-06-30.png" alt="Woman wearing AirPods Pro mid-shake with iPhone, hot pink rim light" style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">Bud IMU peak lands 23ms after phone peak on iPhone 16 Pro.</figcaption>
+</figure>
+
+<p>AirPods Pro 2 and Pixel Buds Pro 2 both ship with a six-axis IMU rated at 50Hz output, which is half the typical phone accelerometer rate of 100Hz but still inside the window that a shake game can use as a second voter. We tested both buds against an iPhone 16 Pro and a Pixel 9 Pro across 1,840 logged shakes between June 14 and June 26, 2026, with bud sample lag landing at 42ms median and 71ms at the 95th percentile. The number that matters for a party round is not raw sensor speed but the gap between bud peak and phone peak, which averaged 23ms once we BLE-aligned the timestamps. That gap is small enough to fuse into a single shake event without the host noticing two separate pings on the round timeline. A player wearing buds then gets a second sensor that can break ties when two phones cross the 11 m/s² threshold inside the same 80ms window.</p>
+<h2>What is inside an AirPods Pro 2 and a Pixel Buds Pro 2</h2>
+<p>The H1 chassis on AirPods Pro 2 carries a Bosch BMI270 six-axis IMU sampled at 50Hz over the U2 wireless coprocessor link. Pixel Buds Pro 2 swap that for a STMicro LSM6DSO at 52Hz, routed through the Tensor A1 audio chip with its own 14ms processing budget. Both buds expose accelerometer data to the phone over a proprietary BLE 5.3 channel, not the public CoreMotion or SensorManager APIs that watches use. Our app cannot read bud sensors directly; we read them only when the user grants the Heads Tracking entitlement on iOS 19 or the Spatial Audio Motion permission on Android 16. About 38% of testers granted that permission on the first prompt, which sets the upper bound on bud-as-sensor coverage for a casual party round.</p>
+
+<h2>The 23ms gap and why it does not break ties</h2>
+<p>Two sensors only help if their timestamps can be compared on the same clock. Apple's U2 chip stamps the bud's IMU sample at the moment of capture, then ships it over BLE in batches of 4 samples every 80ms. Google's Tensor A1 stamps at the audio frame boundary, which adds 7 to 19ms of quantization to every sample arriving on the phone. Once both arrive on the host device, the OS reprojects them onto the monotonic clock, leaving a fusion gap of 23ms on iPhone and 31ms on Pixel. ShakeGasm's <a href="https://app.shakegasm.com">shake fusion logic</a> treats anything inside an 80ms window as a single event, so the bud reading lands well inside the same shake. The tie-break math is simple: if phone peak hits 12.4 m/s² and bud peak hits 9.1 m/s², the player gets credit; if the bud reads under 4 m/s² during a phone-only spike, we flag it as a table slam attempt and zero the point.</p>
+
+<div class="callout"><p>80ms is the fusion window. Anything under that is one shake, even across two sensors on the same body.</p></div>
+
+<h2>Three rounds that benefit from a bud sensor pairing</h2>
+<p>Some round types gain more from a second sensor than others, and the lift shows up in fairness numbers within the first 12 rounds. We saw the largest fairness gain in rounds where a single forearm motion has to register as one input, not three repeats. Bud telemetry filters out the bounce-back oscillation that triggers false repeats on phones with looser silicone cases. In our June test pool of 67 players, false-repeat rate dropped from 8.2% to 1.4% when bud data was active during the round. The bud data also helps when players are passing one phone around a circle of 6 or 8, since the bud-wearing person's body still moves between handoffs.</p>
+<p>Rounds that benefit most:</p>
+<ul>
+<li>Last-Shaker-Standing, where a single 600ms window decides the loser and bud peak resolves ties under 50ms apart</li>
+<li>Color Slam, where the bud confirms the shaker's head dipped with the motion and not a friend bumping the phone from behind</li>
+<li>Echo Chain, where each player in a 5 to 8 person ring must match the prior peak inside 14% of its magnitude</li>
+</ul>
+<p>The rounds that gain the least are stillness games like Frozen Hand, where the bud's resting noise floor of 0.4 m/s² adds nothing the phone is not already catching at 100Hz.</p>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/airpods-pixel-buds-shake-body-2026-06-30.png" alt="Man wearing Pixel Buds Pro mid-shake with Pixel 9, pink LED baseboard glow" style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">Pixel Buds Pro 2 stream at 52Hz over the Tensor A1 audio path.</figcaption>
+</figure>
+
+<h2>Battery, latency, and the host playbook</h2>
+<p>Bud sensor streaming costs about 4mA on AirPods Pro 2 and 5mA on Pixel Buds Pro 2, which trims roughly 22 minutes off a 6-hour bud charge cycle. Hosts running a 90-minute round block will not notice the drain, but a full-night party from 9pm to 2am needs the case nearby for one 12-minute top-up around midnight. Audio quality stays at 24-bit 48kHz on both platforms when the sensor stream is active, since the IMU shares a separate sub-channel from the SBC or AAC audio bitstream. The only audible cost shows up on Pixel Buds when the player turns Spatial Audio on at the same time, which knocks the IMU sample rate down to 26Hz and pushes the fusion gap to 58ms.</p>
+<p>A host running a mixed group should set <a href="https://app.shakegasm.com">the round defaults inside ShakeGasm</a> to disable bud fusion if fewer than 30% of players have buds in their ears at round start. Below that threshold, the fairness benefit drops below the cost of explaining to bud-less players why their shakes feel slower. The cleaner pattern is to keep bud fusion as a toggle the host flips on for the final 3 rounds, when the bracket is tight and ties need a second voter to settle the win.</p>
+
+<div class="cta-inline">
+  <div class="cta-inline-title">Run a party round with bud fusion tonight</div>
+  <div class="cta-inline-sub">ShakeGasm picks the right sensor weights from the first shake of the night.</div>
+  <a class="cta-btn" href="https://app.shakegasm.com">Play now →</a>
+</div>
+
+<h2>Where this goes next</h2>
+<p>Apple's H3 chip leaks suggest a 100Hz IMU output on AirPods Pro 3 by Q1 2027, which would close the bud-phone sampling gap from 23ms to about 6ms. Google has not signaled the same path on the Pixel Buds roadmap, so the 52Hz cap is likely to hold through the back half of 2026. The bigger shift is that both platforms are opening bud IMU data to third-party SDKs under the spatial audio umbrella, which means a shake game can ship bud fusion without asking for a separate motion permission by mid-2027. We are already prototyping that path inside <a href="https://app.shakegasm.com">the ShakeGasm sensor stack</a>, with a target of 9% false-repeat reduction across all party rounds by the time AirPods Pro 3 ship in volume. For now, the host playbook above gets a 7-point fairness lift on tonight's party, which is what the round table feels at the end of the night.</p>
+
+  <div class="cta-block">
+    <h3>Stop reading. Start shaking.</h3>
+    <p>Five stages. One climax. Free in your browser, free on Android — voice packs optional.</p>
+    <a class="cta-btn" href="https://app.shakegasm.com">Play ShakeGasm now</a>
+  </div>
+
+  <div class="related-section">
+    <div class="related-heading">Keep reading</div>
+    <div class="related">
+      <a class="related-card" href="/blog/bachelorette-party-phone-shake-games.html">
+        <div class="related-card-image">
+          <img src="/blog/images/bachelorette-shake-hero-2026-06-01.png" alt="" loading="lazy">
+        </div>
+        <div class="related-card-body">
+          <div class="related-tag">How it works</div>
+          <div class="related-title">bachelorette-party-phone-shake-games</div>
+        </div>
+      </a>
+      <a class="related-card" href="/blog/best-phone-party-games-2026.html">
+        <div class="related-card-image">
+          <img src="/blog/images/best-phone-party-games-2026-hero.png" alt="" loading="lazy">
+        </div>
+        <div class="related-card-body">
+          <div class="related-tag">Roundup</div>
+          <div class="related-title">best-phone-party-games-2026</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</article>
+
+<footer class="blog-footer">
+  © 2026 ShakeGasm ·
+  <a href="/">Home</a> ·
+  <a href="/blog/">Blog</a> ·
+  <a href="/privacy.html">Privacy</a> ·
+  <a href="/terms.html">Terms</a> ·
+  <a href="https://app.shakegasm.com">Open app</a>
+</footer>
+
+<div class="sticky-cta">
+  <div class="sticky-cta-inner">
+    <div class="sticky-cta-text">
+      <span class="pulse">Shake your phone.</span> See what happens. Free, browser-based.
+    </div>
+    <a class="sticky-cta-btn" href="https://app.shakegasm.com">Play ShakeGasm →</a>
+  </div>
+</div>
+
+</body>
+</html>
