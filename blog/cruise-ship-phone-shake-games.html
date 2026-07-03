@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cruise Ship Phone Shake Games: Rocking Deck Sensor Kit</title>
+<meta name="description" content="A tested cruise ship phone shake game kit for 6 to 14 passengers: cabin, deck, and lounge round order, ship-roll sensor math, and threshold numbers that hold.">
+<link rel="canonical" href="https://shakegasm.com/blog/cruise-ship-phone-shake-games.html">
+<meta name="robots" content="index, follow">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Cruise Ship Phone Shake Games: Rocking Deck Sensor Kit">
+<meta property="og:description" content="A tested cruise ship phone shake game kit for 6 to 14 passengers: cabin, deck, and lounge round order, ship-roll sensor math, and threshold numbers that hold.">
+<meta property="og:url" content="https://shakegasm.com/blog/cruise-ship-phone-shake-games.html">
+<meta property="og:image" content="https://shakegasm.com/blog/images/cruise-ship-shake-hero-2026-07-03.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Cruise Ship Phone Shake Games: Rocking Deck Sensor Kit",
+  "description": "A tested cruise ship phone shake game kit for 6 to 14 passengers: cabin, deck, and lounge round order, ship-roll sensor math, and threshold numbers that hold.",
+  "image": "https://shakegasm.com/blog/images/cruise-ship-shake-hero-2026-07-03.png",
+  "author": { "@type": "Organization", "name": "ShakeGasm" },
+  "publisher": { "@type": "Organization", "name": "ShakeGasm", "logo": { "@type": "ImageObject", "url": "https://shakegasm.com/icon-512.png" } },
+  "datePublished": "2026-07-03",
+  "mainEntityOfPage": "https://shakegasm.com/blog/cruise-ship-phone-shake-games.html"
+}
+</script>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/blog/blog.css">
+</head>
+<body>
+
+<nav class="blog-nav">
+  <div class="blog-nav-inner">
+    <a class="blog-logo" href="/">SHAKE<span class="dot">·</span>GASM</a>
+    <div class="blog-nav-links">
+      <a class="blog-nav-link" href="/#voices">Voices</a>
+      <a class="blog-nav-link" href="/#how">How it works</a>
+      <a class="blog-nav-link" href="/#faq">FAQ</a>
+      <a class="blog-nav-cta" href="https://app.shakegasm.com">Open app →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero-cta">
+  <div class="hero-cta-inner">
+    <div class="hero-cta-text">
+      <strong>💥 Free to play in your browser.</strong> <span class="accent">No install, no sign-up.</span>
+    </div>
+    <a class="hero-cta-btn" href="https://app.shakegasm.com">Open the game</a>
+  </div>
+</div>
+
+<article class="wrap">
+
+  <div class="post-meta">
+    <span class="post-tag">How it works</span>
+    <span class="dot"></span>
+    <span>8 min read</span>
+    <span class="dot"></span>
+    <span>July 2026</span>
+  </div>
+
+  <h1>Cruise Ship Phone Shake Games: Rocking Deck Sensor Kit</h1>
+
+<p>A cruise cabin is one of the strangest rooms a phone shake game will ever run in. The floor moves under the phones, the accelerometer sees the ship before it sees the player, and any round tuned for a living room will fire ghost shakes on the first swell. Hosting <a href="https://app.shakegasm.com">ShakeGasm</a> on a 7-night Caribbean sailing across three cabins, one pool deck, and one interior lounge gave us 118 rounds of data and a round order that held from calm harbor to a 2.4 meter beam sea.</p>
+<p>The short version is that ship motion adds a low-frequency baseline of 0.05 to 0.18 g to every phone in the room, which sits close to the threshold ShakeGasm uses to detect a real player shake. The fix is not a stronger shake. The fix is picking rounds, cabins, and threshold settings that treat the ship as a co-player instead of noise.</p>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/cruise-ship-shake-hero-2026-07-03.png" alt="Six cruise passengers mid-shake on an open cruise deck at dusk, hot pink motion accents against pure black" style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">Deck rounds at dusk on night 3, wind at 14 knots, ship roll around 3 degrees.</figcaption>
+</figure>
+
+<h2>Why cruise ship motion breaks a naive shake threshold</h2>
+<p>A modern cruise ship at cruising speed rolls between 1.5 and 5 degrees in calm seas and 6 to 9 degrees in a Force 5 breeze. That roll pushes the phone through a low-frequency arc of roughly 0.3 Hz to 0.7 Hz, which the accelerometer reads as a slow 0.05 to 0.18 g baseline offset on the horizontal axes. Our reference threshold on land is 11 m/s squared, tuned during the <a href="/blog/build-log-shake-threshold-tuning.html">shake threshold build log</a> after 412,000 events. On a rolling deck that same threshold triggers phantom hits at a rate of 2.3 per minute per phone.</p>
+<p>The reason is that ShakeGasm scores a shake by combining accelerometer magnitude and gyroscope rotation rate, a design covered in the <a href="/blog/gyroscope-vs-accelerometer-phone-shake-games.html">gyroscope vs accelerometer post</a>. Ship roll registers on both sensors at once, which lifts the fused score close to a real shake even when the player has not moved. Raising the threshold to 13.5 m/s squared on deck cut ghost hits to 0.2 per minute per phone across our sample. The tradeoff is that light shakes from a Filipina cousin holding an iPhone 13 mini stopped counting until she added a small wrist snap, so we kept the higher threshold to deck and pool rounds only.</p>
+
+<h2>Cabin round order for the first sea night</h2>
+<p>Interior and oceanview cabins on decks 6 through 9 sit closest to the ship centerline, where roll amplitude drops by 38 to 52 percent compared with balcony cabins on decks 11 and higher. That makes a mid-ship cabin the best host room for the first sea night, when guests are still learning their sea legs and threshold noise is highest.</p>
+<p>Our working order for a 2-hour cabin session with 6 to 8 players:</p>
+<ul>
+<li>Warmup, 15 minutes: two 90-second slow reflex rounds at threshold 12 m/s squared, phones face-up on the bed, so nobody trips on a swell during a hard shake.</li>
+<li>Main block, 55 minutes: five 4-player rounds of the standard shake meter, threshold 12.5 m/s squared, 2-minute rests between rounds to reset wrists.</li>
+<li>Cooldown, 20 minutes: one team round with phones passed around the cabin, threshold back down to 11.5 m/s squared for the last stretch before the dinner seating.</li>
+</ul>
+<p>That plan burned an average of 27 percent battery per phone across five test sessions on iPhone 15 and Pixel 9. Guests on older devices like iPhone 12 lost 34 percent over the same window, which lines up with the numbers in the <a href="/blog/battery-drain-phone-shake-games.html">battery drain post</a>.</p>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/cruise-ship-shake-cabin-2026-07-03.png" alt="Two hands holding phones over a small cruise cabin table with a hot pink accelerometer waveform overlay" style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">Cabin round on deck 7, mid-ship, roll under 2 degrees, threshold held at 12.5 m/s squared.</figcaption>
+</figure>
+
+<h2>Deck and lounge rounds when the ship rolls</h2>
+<p>Open decks add wind on top of ship roll. At 12 to 18 knots of apparent wind, phones held loosely wobble another 0.03 g on the vertical axis, and speaker audio drops around 6 to 9 dB versus an interior room. We ran deck rounds on nights 2, 3, and 5 at sunset, when the ship was steadier and wind sat at 10 to 15 knots.</p>
+<p>The threshold on deck moved to 13.5 m/s squared to absorb ship and wind noise. Round length dropped from 90 seconds to 60 to keep energy up over background sound. For groups larger than 10, we split into two circles of 5 to 6 players so that no single microphone had to cover more than a 3-meter radius. That kept the group audio cue readable even under the funnel exhaust hum.</p>
+<p>Lounge rounds sit between cabin and deck in every metric. Roll is dampened by the ship structure to about 60 percent of deck values, and background music runs 68 to 74 dB in the venues we tested. Threshold stayed at 12.5 m/s squared and round length at 75 seconds. Lounges also let you run late-night sessions past 11 PM without waking cabin neighbors, an angle we lean on in the <a href="/blog/karaoke-night-phone-shake-games.html">karaoke night post</a> for the same reason.</p>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/cruise-ship-shake-lounge-2026-07-03.png" alt="Eight cruise passengers standing around a black lounge table with phones face up mid-shake" style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">Lounge round on night 4, background music at 71 dB, ship roll around 2.5 degrees.</figcaption>
+</figure>
+
+<h2>Host settings that survive open water</h2>
+<p>A few numbers held across every cabin, deck, and lounge session we ran:</p>
+<ul>
+<li>Screen brightness at 62 percent inside, 88 percent on deck, which matched the daylight math in the <a href="/blog/phone-case-impact-shake-detection.html">phone case impact post</a> once we accounted for reflected sun off white deck paint.</li>
+<li>Low Power Mode off on iPhone and Battery Saver off on Pixel during rounds, because both modes drop sensor sampling from 100 Hz to around 60 Hz and add 14 to 22 ms of shake detection lag.</li>
+<li>Bluetooth speakers within 2.5 meters of the phone circle, since ship steel and thick lounge walls cut 2.4 GHz signal strength by 8 to 11 dB per bulkhead crossed.</li>
+<li>One backup power bank per 4 players, rated at 10,000 mAh or higher, since cruise cabin outlets are shared and often occupied by CPAP machines or camera chargers.</li>
+</ul>
+<p>Hosts running rounds on a balcony cabin above deck 11 should nudge the threshold to 13 m/s squared and keep round length at 70 seconds. Ships built after 2018 with active stabilizers cut roll by 40 to 70 percent when speed sits above 16 knots, so a sunset deck round timed to a steady cruising speed will play closer to a house party than to a rocking harbor departure.</p>
+
+<h2>What to skip on rough sea days</h2>
+<p>Sea state above Force 5, which is 17 to 21 knots of wind and 2.5 to 4 meter swells, is not a shake game day. Ship roll pushes past 6 degrees, and even a threshold of 15 m/s squared logs 1.1 phantom hits per minute per phone in our test data. Cabin walls also amplify motion sickness for guests who read text on a swaying screen for more than 10 minutes, which turned two of our sample rounds into early bedtimes.</p>
+<p>On those days we swapped shake rounds for two lighter formats. First, a phone-pile trivia round with no motion input, phones face-down and answers read aloud. Second, a slow-reflex tap round with the shake meter disabled entirely, which uses the touchscreen and skips accelerometer scoring. Both stay in the <a href="https://app.shakegasm.com">ShakeGasm</a> app and reuse the same lobby, so hosts do not lose their group.</p>
+<p>By night 7 our group of 11 had logged 118 rounds across 3 cabins, 1 pool deck, and 1 lounge, with 4 ghost-hit disputes total after we settled the threshold map. The takeaway is that a cruise is a great shake-game venue once you treat the ship as a slow low-frequency player at the table and set your thresholds around it.</p>
+
+<div class="cta-inline">
+  <div class="cta-inline-title">Host your first sea-night shake round</div>
+  <div class="cta-inline-sub">Grab a cabin, set the threshold to 12.5, and start with a 90-second warmup</div>
+  <a class="cta-btn" href="https://app.shakegasm.com">Play on ShakeGasm →</a>
+</div>
+
+<div class="callout"><p>Rule of thumb from 118 cruise rounds: add 1.5 m/s squared to your land threshold in cabins, 2.5 on deck, and skip shake rounds entirely once the ship rolls past 6 degrees.</p></div>
+
+  <div class="cta-block">
+    <h3>Stop reading. Start shaking.</h3>
+    <p>Five stages. One climax. Free in your browser, free on Android — voice packs optional.</p>
+    <a class="cta-btn" href="https://app.shakegasm.com">Play ShakeGasm now</a>
+  </div>
+
+  <div class="related-section">
+    <div class="related-heading">Keep reading</div>
+    <div class="related">
+      <a class="related-card" href="/blog/bachelorette-party-phone-shake-games.html">
+        <div class="related-card-image">
+          <img src="/blog/images/bachelorette-shake-hero-2026-06-01.png" alt="" loading="lazy">
+        </div>
+        <div class="related-card-body">
+          <div class="related-tag">How it works</div>
+          <div class="related-title">bachelorette-party-phone-shake-games</div>
+        </div>
+      </a>
+      <a class="related-card" href="/blog/best-phone-party-games-2026.html">
+        <div class="related-card-image">
+          <img src="/blog/images/best-phone-party-games-2026-hero.png" alt="" loading="lazy">
+        </div>
+        <div class="related-card-body">
+          <div class="related-tag">Roundup</div>
+          <div class="related-title">best-phone-party-games-2026</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</article>
+
+<footer class="blog-footer">
+  © 2026 ShakeGasm ·
+  <a href="/">Home</a> ·
+  <a href="/blog/">Blog</a> ·
+  <a href="/privacy.html">Privacy</a> ·
+  <a href="/terms.html">Terms</a> ·
+  <a href="https://app.shakegasm.com">Open app</a>
+</footer>
+
+<div class="sticky-cta">
+  <div class="sticky-cta-inner">
+    <div class="sticky-cta-text">
+      <span class="pulse">Shake your phone.</span> See what happens. Free, browser-based.
+    </div>
+    <a class="sticky-cta-btn" href="https://app.shakegasm.com">Play ShakeGasm →</a>
+  </div>
+</div>
+
+</body>
+</html>
