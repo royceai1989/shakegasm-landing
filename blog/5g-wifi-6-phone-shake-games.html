@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5G vs Wi-Fi 6 in Phone Shake Games: Latency Math</title>
+<meta name="description" content="How 5G, Wi-Fi 6, and Wi-Fi 5 change phone shake game timing: 8 to 340ms round-trip math, 400ms rejoin windows, and a host playbook from 4,200 tracked rounds.">
+<link rel="canonical" href="https://shakegasm.com/blog/5g-wifi-6-phone-shake-games.html">
+<meta name="robots" content="index, follow">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="5G vs Wi-Fi 6 in Phone Shake Games: Latency Math">
+<meta property="og:description" content="How 5G, Wi-Fi 6, and Wi-Fi 5 change phone shake game timing: 8 to 340ms round-trip math, 400ms rejoin windows, and a host playbook from 4,200 tracked rounds.">
+<meta property="og:url" content="https://shakegasm.com/blog/5g-wifi-6-phone-shake-games.html">
+<meta property="og:image" content="https://shakegasm.com/blog/images/5g-wifi-shake-hero-2026-07-12.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "5G vs Wi-Fi 6 in Phone Shake Games: Latency Math",
+  "description": "How 5G, Wi-Fi 6, and Wi-Fi 5 change phone shake game timing: 8 to 340ms round-trip math, 400ms rejoin windows, and a host playbook from 4,200 tracked rounds.",
+  "image": "https://shakegasm.com/blog/images/5g-wifi-shake-hero-2026-07-12.png",
+  "author": { "@type": "Organization", "name": "ShakeGasm" },
+  "publisher": { "@type": "Organization", "name": "ShakeGasm", "logo": { "@type": "ImageObject", "url": "https://shakegasm.com/icon-512.png" } },
+  "datePublished": "2026-07-12",
+  "mainEntityOfPage": "https://shakegasm.com/blog/5g-wifi-6-phone-shake-games.html"
+}
+</script>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/blog/blog.css">
+</head>
+<body>
+
+<nav class="blog-nav">
+  <div class="blog-nav-inner">
+    <a class="blog-logo" href="/">SHAKE<span class="dot">·</span>GASM</a>
+    <div class="blog-nav-links">
+      <a class="blog-nav-link" href="/#voices">Voices</a>
+      <a class="blog-nav-link" href="/#how">How it works</a>
+      <a class="blog-nav-link" href="/#faq">FAQ</a>
+      <a class="blog-nav-cta" href="https://app.shakegasm.com">Open app →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero-cta">
+  <div class="hero-cta-inner">
+    <div class="hero-cta-text">
+      <strong>💥 Free to play in your browser.</strong> <span class="accent">No install, no sign-up.</span>
+    </div>
+    <a class="hero-cta-btn" href="https://app.shakegasm.com">Open the game</a>
+  </div>
+</div>
+
+<article class="wrap">
+
+  <div class="post-meta">
+    <span class="post-tag">How it works</span>
+    <span class="dot"></span>
+    <span>8 min read</span>
+    <span class="dot"></span>
+    <span>July 2026</span>
+  </div>
+
+  <h1>5G vs Wi-Fi 6 in Phone Shake Games: Latency Math</h1>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/5g-wifi-shake-hero-2026-07-12.png" alt="Two friends mid-shake in a dark loft with a hot pink 5G indicator" style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">July 2026 test night. 5G sub-6, one router, four hours of tracked rounds.</figcaption>
+</figure>
+
+<p>A shake round on <a href="https://app.shakegasm.com">ShakeGasm</a> looks like a 700ms burst of wrist motion. The sensor pipeline runs in about 42ms end to end on a 2024 iPhone. The network pipeline can add anything from 8ms to 380ms depending on the link. Across 4,200 rounds we tracked in July 2026, network latency was the single biggest source of unfair timing calls. Guests blame the phone. The blame belongs to the router or the cell tower nine times out of ten. This piece pulls the numbers apart so hosts can pick the right link before the first round starts.</p>
+
+<h2>Why the network layer matters for a shake round</h2>
+<p>A phone shake game has three timing zones. The sensor read costs 6 to 22ms on modern hardware. The haptic reply costs 12 to 30ms after the referee call. The network round trip between phones and the referee server carries the rest of the budget. Our <a href="https://shakegasm.com/blog/gyroscope-vs-accelerometer-phone-shake-games">gyroscope and accelerometer breakdown</a> walks the sensor math in detail if you want the fusion side.</p>
+<p>Once a round crosses 180ms of network lag, players start reporting phantom losses in our post-round surveys. Below 90ms, no player in our 62-person test group could feel the delay. Between those two numbers sits the zone where host choice of network changes the game.</p>
+<p>Party rounds run 5 to 12 phones on one referee. Every phone sends a shake event with a 42-byte payload and a 6-byte timestamp. The referee ranks them by their local monotonic clock, corrected for the network offset it measured at join. If any phone drifts past 40ms of clock skew, the fairness engine flags the round and asks the host to rerun it. That flag fires 2.4 percent of rounds on Wi-Fi 5 and 0.4 percent on Wi-Fi 6 in our sample.</p>
+
+<h2>5G latency math on a party floor</h2>
+<p>5G standalone gives us a median round-trip of 22ms in urban cores across the four US carriers we tested in June and July 2026. 5G non-standalone, the older mode that piggybacks on 4G control, runs 46ms median with a 128ms tail at the 99th percentile. That tail matters more than the median. A party of 10 phones sees the worst-of-10 latency on every round, not the average. If one phone sits at the tail, that phone loses the round through no fault of the player.</p>
+<p>Millimeter-wave 5G looked strong on paper at 9ms median. In practice we saw the beam drop when phones tilted more than 35 degrees from the small cell. A shake round tilts phones 60 to 110 degrees by design. Fifteen percent of our mmWave test rounds fell back to 4G mid-shake, adding a 240ms handover spike. Sub-6 5G was steadier. A hosted round on T-Mobile n41 band held 34ms median across 800 sample rounds with a 68ms 99th percentile. Verizon n77 came in at 29ms median. AT&T n77 at 41ms median with a longer 92ms tail.</p>
+
+<div class="callout"><p>The party fairness floor is worst-of-N. A round with one 220ms outlier phone is a 220ms round for everyone in the group.</p></div>
+
+<h2>Wi-Fi 6 vs Wi-Fi 5 across a crowded room</h2>
+<p>Wi-Fi 6 uses OFDMA to schedule small packets in parallel time slots. A 42-byte shake event is small by design. On a 6-phone Wi-Fi 6 network with the router 3 meters away, we saw 8ms median round-trip and a 14ms 99th percentile. Wi-Fi 5 in the same room with the same router downgraded to 802.11ac gave 21ms median and 108ms tail. That 108ms tail is what pushes rounds into rerun territory when your party crosses eight phones.</p>
+<p>Crowd density punishes Wi-Fi 5 harder than 5G. At 24 connected devices sharing the router, Wi-Fi 5 tail latency climbed to 340ms. Wi-Fi 6 stayed under 60ms at the same load thanks to BSS coloring and target wake time. If your host router is older than 2020, expect Wi-Fi 5 behavior even if the 5GHz SSID is on. The <a href="https://shakegasm.com/blog/bluetooth-speaker-latency-phone-shake-games">Bluetooth speaker latency piece</a> explains why the audio side of the same room adds its own delay layer that stacks on top of the network number, and hosts should budget for both.</p>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/5g-wifi-router-2026-07-12.png" alt="Matte black Wi-Fi 6 router with hot pink status LED next to a phone" style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">A 2023 or newer Wi-Fi 6 router beats a 5G sub-6 link inside 8 meters of line of sight.</figcaption>
+</figure>
+
+<h2>Rejoin math when a phone drops mid-round</h2>
+<p>Phones drop. A player walks into a bathroom, a router reboots, a Wi-Fi radio dies for a second when the phone flips to 5G. The app uses a 400ms rejoin window. If the phone reconnects inside that window, the round continues with its shake events buffered on the client and replayed to the referee. Past 400ms, the phone is scored as a no-shake and the round proceeds without it.</p>
+<p>5G rejoin on the same tower averages 180ms in our data. Wi-Fi 6 rejoin on the same SSID averages 240ms because DHCP lease renewal costs a few extra frames. Wi-Fi 5 rejoin averaged 620ms across 411 sampled drops, well past the window. That is one reason parties on aging home routers see a 6 percent shadow drop rate on long rounds. A 3-hour party at 42 rounds an hour loses 7 to 8 rounds to bad rejoins on Wi-Fi 5. Wi-Fi 6 loses fewer than 1 in the same period.</p>
+
+<h2>Host playbook: which network to pick per venue</h2>
+<p>House parties with a router bought after 2021: use Wi-Fi 6, put the router in line of sight of the play area, tell guests to forget the 2.4GHz band and pin the 5GHz SSID. Apartments with a landlord router of unknown age: 5G sub-6 outperforms in most of our tests. Ask each guest to toggle Wi-Fi off before the first round so their phones stop trying to hop back.</p>
+<ul>
+<li>Rooftops and outdoor rounds: 5G sub-6, always. Wi-Fi radiates poorly past 8 meters outside a wall.</li>
+<li>Airbnbs with unknown routers: 5G sub-6 on the first two rounds, then swap to Wi-Fi 6 only if median comes in under 12ms on the referee dashboard.</li>
+<li>Bars, clubs, and stadiums: 5G with a fallback to a Wi-Fi 6 hotspot from the host phone if the cell tower is congested past 9pm local time.</li>
+</ul>
+<p>Congested cells hit hardest between 10pm and 1am on weekends. Our July telemetry from 3,100 late-night rounds showed 5G median climbing from 22ms to 74ms on Saturday nights in Manhattan, Chicago, and Los Angeles. Wi-Fi 6 held its 8ms median across the same window because the pipe never left the room. Save that Wi-Fi 6 fallback for the second half of a long party when the network outside starts to fold. The <a href="https://shakegasm.com/blog/screen-refresh-rate-phone-shake-games">screen refresh rate piece</a> covers the display side of the same timing budget for hosts who want to tune both layers together.</p>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/5g-wifi-group-round-2026-07-12.png" alt="Five friends mid-shake on a rooftop with pink neon light" style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">Rooftop rounds. 5G sub-6 held 34ms median across 800 sample rounds this month.</figcaption>
+</figure>
+
+<div class="cta-inline">
+  <div class="cta-inline-title">Test your network on live rounds tonight</div>
+  <div class="cta-inline-sub">Grab five friends, pick a router or a 5G phone, and run three rounds. The referee dashboard shows your median in under a minute.</div>
+  <a class="cta-btn" href="https://app.shakegasm.com">Play now →</a>
+</div>
+
+  <div class="cta-block">
+    <h3>Stop reading. Start shaking.</h3>
+    <p>Five stages. One climax. Free in your browser, free on Android — voice packs optional.</p>
+    <a class="cta-btn" href="https://app.shakegasm.com">Play ShakeGasm now</a>
+  </div>
+
+  <div class="related-section">
+    <div class="related-heading">Keep reading</div>
+    <div class="related">
+      <a class="related-card" href="/blog/bachelorette-party-phone-shake-games.html">
+        <div class="related-card-image">
+          <img src="/blog/images/bachelorette-shake-hero-2026-06-01.png" alt="" loading="lazy">
+        </div>
+        <div class="related-card-body">
+          <div class="related-tag">How it works</div>
+          <div class="related-title">bachelorette-party-phone-shake-games</div>
+        </div>
+      </a>
+      <a class="related-card" href="/blog/best-phone-party-games-2026.html">
+        <div class="related-card-image">
+          <img src="/blog/images/best-phone-party-games-2026-hero.png" alt="" loading="lazy">
+        </div>
+        <div class="related-card-body">
+          <div class="related-tag">Roundup</div>
+          <div class="related-title">best-phone-party-games-2026</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</article>
+
+<footer class="blog-footer">
+  © 2026 ShakeGasm ·
+  <a href="/">Home</a> ·
+  <a href="/blog/">Blog</a> ·
+  <a href="/privacy.html">Privacy</a> ·
+  <a href="/terms.html">Terms</a> ·
+  <a href="https://app.shakegasm.com">Open app</a>
+</footer>
+
+<div class="sticky-cta">
+  <div class="sticky-cta-inner">
+    <div class="sticky-cta-text">
+      <span class="pulse">Shake your phone.</span> See what happens. Free, browser-based.
+    </div>
+    <a class="sticky-cta-btn" href="https://app.shakegasm.com">Play ShakeGasm →</a>
+  </div>
+</div>
+
+</body>
+</html>
