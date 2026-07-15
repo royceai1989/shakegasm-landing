@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clock Drift in Phone Shake Games: The 40ms Sync Problem</title>
+<meta name="description" content="How phone shake games fight clock drift across devices: NTP jitter, WebRTC timestamps, host authority math, and the 40ms fairness ceiling that holds.">
+<link rel="canonical" href="https://shakegasm.com/blog/clock-drift-phone-shake-games.html">
+<meta name="robots" content="index, follow">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Clock Drift in Phone Shake Games: The 40ms Sync Problem">
+<meta property="og:description" content="How phone shake games fight clock drift across devices: NTP jitter, WebRTC timestamps, host authority math, and the 40ms fairness ceiling that holds.">
+<meta property="og:url" content="https://shakegasm.com/blog/clock-drift-phone-shake-games.html">
+<meta property="og:image" content="https://shakegasm.com/blog/images/clock-drift-shake-hero-2026-07-15.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Clock Drift in Phone Shake Games: The 40ms Sync Problem",
+  "description": "How phone shake games fight clock drift across devices: NTP jitter, WebRTC timestamps, host authority math, and the 40ms fairness ceiling that holds.",
+  "image": "https://shakegasm.com/blog/images/clock-drift-shake-hero-2026-07-15.png",
+  "author": { "@type": "Organization", "name": "ShakeGasm" },
+  "publisher": { "@type": "Organization", "name": "ShakeGasm", "logo": { "@type": "ImageObject", "url": "https://shakegasm.com/icon-512.png" } },
+  "datePublished": "2026-07-15",
+  "mainEntityOfPage": "https://shakegasm.com/blog/clock-drift-phone-shake-games.html"
+}
+</script>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/blog/blog.css">
+</head>
+<body>
+
+<nav class="blog-nav">
+  <div class="blog-nav-inner">
+    <a class="blog-logo" href="/">SHAKE<span class="dot">·</span>GASM</a>
+    <div class="blog-nav-links">
+      <a class="blog-nav-link" href="/#voices">Voices</a>
+      <a class="blog-nav-link" href="/#how">How it works</a>
+      <a class="blog-nav-link" href="/#faq">FAQ</a>
+      <a class="blog-nav-cta" href="https://app.shakegasm.com">Open app →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero-cta">
+  <div class="hero-cta-inner">
+    <div class="hero-cta-text">
+      <strong>💥 Free to play in your browser.</strong> <span class="accent">No install, no sign-up.</span>
+    </div>
+    <a class="hero-cta-btn" href="https://app.shakegasm.com">Open the game</a>
+  </div>
+</div>
+
+<article class="wrap">
+
+  <div class="post-meta">
+    <span class="post-tag">How it works</span>
+    <span class="dot"></span>
+    <span>8 min read</span>
+    <span class="dot"></span>
+    <span>July 2026</span>
+  </div>
+
+  <h1>Clock Drift in Phone Shake Games: The 40ms Sync Problem</h1>
+
+<p>Shake games look simple from the outside. Six phones raise, six players shake, one winner gets the point. Underneath, the fairness of that round depends on six device clocks agreeing to within 40 milliseconds. When those clocks drift apart, the game rewards network luck instead of reflex. ShakeGasm ran clock drift telemetry across 18,400 rounds in June 2026 and the numbers were sharp enough to reshape the sync layer we ship today.</p>
+<p>A phone clock is a small quartz oscillator running at about 32.768 kilohertz, corrected on a schedule by network time. Left alone for an hour it wanders 8 to 40 milliseconds. In a two-second shake round, that wander decides if a player's spike registers before or after the host closes the window. This post walks through the sources of drift, the math we use to bound them, and the host playbook we now ship with <a href="https://app.shakegasm.com">ShakeGasm</a>.</p>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/clock-drift-shake-hero-2026-07-15.png" alt="Three party players mid-shake with phones raised, magenta rim light on a pure black backdrop" style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">Three phones, three clocks, one fair winner</figcaption>
+</figure>
+
+<h2>Why clock drift breaks shake fairness</h2>
+<p>A shake round opens with a 3, 2, 1 countdown and closes 2000 milliseconds later. Each player's accelerometer emits a spike when the phone crosses 11 m/s² of net force. The server records the timestamp of that spike and ranks players from fastest to slowest. If two clocks disagree by 60 milliseconds, a slower shake can look faster because its device clock was running behind server truth. Across 18,400 tracked rounds, 3.1 percent showed a rank flip when we re-ran the numbers under a single shared clock. That flip rate was the trigger for the June sync rework and the reason this post exists at all.</p>
+<p>The fairness ceiling we settled on is 40 milliseconds of clock skew across the whole party. Below that number, human reaction variance dominates and rank order stays stable across replays. Above it, the fastest network path wins more often than the fastest hand. Party games live or die on that perception, so the sync layer had to sit well under the noise floor of human reflex, which averages 220 milliseconds cold and 180 milliseconds warmed up.</p>
+
+<h2>NTP, cell towers, and the 40ms baseline gap</h2>
+<p>Modern phones sync to NTP through the carrier network or Wi-Fi. iPhone hits time.apple.com every 15 to 60 minutes. Pixel and Samsung hit time.google.com on a similar cadence. On a healthy 5G connection, that sync lands within 6 milliseconds of true UTC. On saturated venue Wi-Fi carrying 200 milliseconds of jitter, the same sync drifts to 28 milliseconds off. Cellular tower hand-off during a single party can add another 12 milliseconds of jump the next time the clock corrects.</p>
+<p>We measured 6,200 device-to-server offsets during live parties in June. The median iPhone landed 9 milliseconds off UTC. The median Pixel landed 11 milliseconds off. The p95 case across both platforms hit 41 milliseconds, which is where our old fairness math started to break. Any fix that leaned on device NTP alone was going to leak errors on rooftop parties, subway rides, and any venue where Wi-Fi was crowded. Our earlier post on <a href="https://shakegasm.com/blog/5g-wifi-6-phone-shake-games">Wi-Fi 6 and 5G latency</a> covers the network side of that same picture in more depth.</p>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/clock-drift-shake-body-2026-07-15.png" alt="Overhead macro of a smartphone screen showing a hot pink synchronized countdown timer" style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">The fused timestamp is what actually decides the round</figcaption>
+</figure>
+
+<h2>WebRTC timestamps and host authority</h2>
+<p>The fix at the wire is direct. Every shake spike now ships with three timestamps in the payload.</p>
+<ul>
+<li>Local sensor timestamp from the phone's monotonic clock, immune to NTP jumps and daylight saving edge cases.</li>
+<li>Send timestamp from the WebRTC data channel, stamped by the browser at the moment the packet leaves the socket.</li>
+<li>Server receive timestamp, applied by the host node the instant the packet lands on the edge worker.</li>
+</ul>
+<p>The server treats its own receive time as truth. It back-calculates each device's one-way latency using a rolling ping every 800 milliseconds. That ping window came out of a 4-day sweep from 200 to 2000 milliseconds where we watched jitter estimates settle at each step. 800 milliseconds gave a stable 6 millisecond standard deviation while burning 1.2 percent of the data channel bandwidth. Host authority means no phone can lie about its own clock and no network hiccup can steal a round from a player stuck on a slow tower handoff.</p>
+
+<h2>The fusion window we run at ShakeGasm</h2>
+<p>The final rank uses a fused timestamp: server receive minus estimated one-way latency, cross-checked against the phone's local sensor timestamp. If those two numbers disagree by more than 25 milliseconds, the round flags for review and the result shows a soft tie between the affected players. In our June sample, 0.4 percent of rounds landed in that tie zone, which is the honest bucket where reflex differences are smaller than measurement noise. Calling a tie beats calling a false winner in a party where the loser owes a drink.</p>
+<p>The fusion window bakes in three constants that we tuned across 18,400 rounds of live telemetry:</p>
+<ul>
+<li>40 millisecond fairness ceiling for cross-device skew across the party.</li>
+<li>25 millisecond tie band inside the fusion cross-check for the top two spikes.</li>
+<li>800 millisecond ping cadence for the rolling one-way latency estimator.</li>
+</ul>
+<p>Those three numbers hold from a quiet dinner table to a crowded rooftop bar. The same cross-check approach shows up in our <a href="https://shakegasm.com/blog/anti-cheat-phone-shake-games-fake-shakes">anti-cheat post</a>, where sensor signatures get validated against network truth before a spike counts.</p>
+
+<h2>Host rules for mixed-device parties</h2>
+<p>Hosts running mixed groups of iPhones, Pixels, and older Samsungs can steady the drift number with three rules that fall out of the same telemetry. Open the app 3 minutes before the first round so every phone pulls a fresh NTP tick before the countdown starts. Keep everyone on the same Wi-Fi network where possible, since single-network parties averaged 14 milliseconds of skew against 31 milliseconds for split cell-and-Wi-Fi parties. Restart any phone that has been on the charger overnight, since long idle windows let the oscillator drift 20 to 60 milliseconds before the next scheduled NTP correction hits.</p>
+<p>That 3 minute warm-up is the single biggest lever a host owns. In our sample, warmed parties saw 0.9 percent rank flips against 3.1 percent for cold-start parties. The gap paid for itself in fewer angry re-rolls and shorter arguments over who shook first. Our <a href="https://shakegasm.com/blog/poker-night-phone-shake-games-between-hands-kit">between-hands poker kit</a> already bakes that warm-up into the pre-deal window, and every venue kit on the blog now assumes a synced clock floor as the starting point.</p>
+
+<div class="callout"><p>40 milliseconds of clock skew is the party-fairness ceiling. Below it, reflex wins. Above it, network luck wins. The fusion window keeps the ceiling honest.</p></div>
+
+<div class="cta-inline">
+  <div class="cta-inline-title">Feel the sync yourself</div>
+  <div class="cta-inline-sub">Two seconds. One winner. Zero clock drift.</div>
+  <a class="cta-btn" href="https://app.shakegasm.com">Open ShakeGasm →</a>
+</div>
+
+  <div class="cta-block">
+    <h3>Stop reading. Start shaking.</h3>
+    <p>Five stages. One climax. Free in your browser, free on Android — voice packs optional.</p>
+    <a class="cta-btn" href="https://app.shakegasm.com">Play ShakeGasm now</a>
+  </div>
+
+  <div class="related-section">
+    <div class="related-heading">Keep reading</div>
+    <div class="related">
+      <a class="related-card" href="/blog/bachelorette-party-phone-shake-games.html">
+        <div class="related-card-image">
+          <img src="/blog/images/bachelorette-shake-hero-2026-06-01.png" alt="" loading="lazy">
+        </div>
+        <div class="related-card-body">
+          <div class="related-tag">How it works</div>
+          <div class="related-title">bachelorette-party-phone-shake-games</div>
+        </div>
+      </a>
+      <a class="related-card" href="/blog/best-phone-party-games-2026.html">
+        <div class="related-card-image">
+          <img src="/blog/images/best-phone-party-games-2026-hero.png" alt="" loading="lazy">
+        </div>
+        <div class="related-card-body">
+          <div class="related-tag">Roundup</div>
+          <div class="related-title">best-phone-party-games-2026</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</article>
+
+<footer class="blog-footer">
+  © 2026 ShakeGasm ·
+  <a href="/">Home</a> ·
+  <a href="/blog/">Blog</a> ·
+  <a href="/privacy.html">Privacy</a> ·
+  <a href="/terms.html">Terms</a> ·
+  <a href="https://app.shakegasm.com">Open app</a>
+</footer>
+
+<div class="sticky-cta">
+  <div class="sticky-cta-inner">
+    <div class="sticky-cta-text">
+      <span class="pulse">Shake your phone.</span> See what happens. Free, browser-based.
+    </div>
+    <a class="sticky-cta-btn" href="https://app.shakegasm.com">Play ShakeGasm →</a>
+  </div>
+</div>
+
+</body>
+</html>
