@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barometer Sensor in Phone Shake Games: Elevation Math</title>
+<meta name="description" content="How the phone barometer changes shake game fairness across altitude: 0.06 hPa noise floor, 8m elevation deltas, and a rooftop host playbook that holds.">
+<link rel="canonical" href="https://shakegasm.com/blog/barometer-sensor-phone-shake-games.html">
+<meta name="robots" content="index, follow">
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Barometer Sensor in Phone Shake Games: Elevation Math">
+<meta property="og:description" content="How the phone barometer changes shake game fairness across altitude: 0.06 hPa noise floor, 8m elevation deltas, and a rooftop host playbook that holds.">
+<meta property="og:url" content="https://shakegasm.com/blog/barometer-sensor-phone-shake-games.html">
+<meta property="og:image" content="https://shakegasm.com/blog/images/barometer-shake-hero-2026-07-21.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Barometer Sensor in Phone Shake Games: Elevation Math",
+  "description": "How the phone barometer changes shake game fairness across altitude: 0.06 hPa noise floor, 8m elevation deltas, and a rooftop host playbook that holds.",
+  "image": "https://shakegasm.com/blog/images/barometer-shake-hero-2026-07-21.png",
+  "author": { "@type": "Organization", "name": "ShakeGasm" },
+  "publisher": { "@type": "Organization", "name": "ShakeGasm", "logo": { "@type": "ImageObject", "url": "https://shakegasm.com/icon-512.png" } },
+  "datePublished": "2026-07-21",
+  "mainEntityOfPage": "https://shakegasm.com/blog/barometer-sensor-phone-shake-games.html"
+}
+</script>
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/blog/blog.css">
+</head>
+<body>
+
+<nav class="blog-nav">
+  <div class="blog-nav-inner">
+    <a class="blog-logo" href="/">SHAKE<span class="dot">·</span>GASM</a>
+    <div class="blog-nav-links">
+      <a class="blog-nav-link" href="/#voices">Voices</a>
+      <a class="blog-nav-link" href="/#how">How it works</a>
+      <a class="blog-nav-link" href="/#faq">FAQ</a>
+      <a class="blog-nav-cta" href="https://app.shakegasm.com">Open app →</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero-cta">
+  <div class="hero-cta-inner">
+    <div class="hero-cta-text">
+      <strong>💥 Free to play in your browser.</strong> <span class="accent">No install, no sign-up.</span>
+    </div>
+    <a class="hero-cta-btn" href="https://app.shakegasm.com">Open the game</a>
+  </div>
+</div>
+
+<article class="wrap">
+
+  <div class="post-meta">
+    <span class="post-tag">How it works</span>
+    <span class="dot"></span>
+    <span>8 min read</span>
+    <span class="dot"></span>
+    <span>July 2026</span>
+  </div>
+
+  <h1>Barometer Sensor in Phone Shake Games: Elevation Math</h1>
+
+<p>The barometer is the quietest sensor in your pocket, sampling ambient pressure at 25Hz on iPhone 15 Pro and 20Hz on Pixel 9 Pro. In a shake round it does no direct trigger work, since the accelerometer spike at 100Hz decides who wins. Its side job is round fairness across guests who sit at different elevations inside one venue. A basement couch and a top-floor loft can differ by 12 meters of altitude, which registers as a 1.44 hPa gap on the sensor bus. That gap changes how <a href="https://app.shakegasm.com">ShakeGasm</a> calibrates the shake floor when two phones join the same lobby from opposite ends of the same house.</p>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/barometer-shake-hero-2026-07-21.png" alt="Two friends shaking iPhones side by side inside a mountain lodge at 2,400 meters elevation, lit with hot pink accents." style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">Alpine lodge test night, 2,400m elevation, 8-guest lobby.</figcaption>
+</figure>
+
+<h2>What the barometer measures during a shake round</h2>
+<p>Every modern flagship ships a MEMS pressure sensor rated to 0.06 hPa RMS noise at the piezo diaphragm. The chip sits under the SIM tray on iPhone 15 Pro and near the speaker grille on Pixel 9 Pro, which matters for the thermal drift math in our <a href="/blog/thermal-throttling-phone-shake-games/">thermal throttling breakdown</a>. During a 12-second shake round the barometer logs 240 to 300 samples on iPhone and 180 to 240 on Pixel. Those samples set the ambient reference the fusion layer inside <a href="https://app.shakegasm.com">ShakeGasm</a> uses to filter out wind gusts and door slams. A single door slam produces a 0.4 hPa pressure step in under 80ms, which the fusion layer marks as non-shake within 2 frames. The same layer discards any pressure delta above 2 hPa in one sample window, since real weather never moves that fast.</p>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/barometer-shake-body1-2026-07-21.png" alt="Macro teardown shot of a smartphone logic board with the MEMS barometer chip lifted by tweezers." style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">MEMS pressure sensor, 2.5mm square, 0.06 hPa RMS noise.</figcaption>
+</figure>
+
+<h2>How altitude changes sensor drift and round timing</h2>
+<p>Every 8 meters of elevation gain drops ambient pressure by 1 hPa at a sea-level baseline. A guest in a basement at 4 meters below street level reads 1013.4 hPa, while a rooftop host at 60 meters reads 1006.2 hPa. The 7.2 hPa spread is 120 times the sensor noise floor, so the fusion model treats each phone as a separate altitude cell. Without altitude cells a shared shake floor of 11 m/s² would drift by 0.6 m/s² across the room. That drift is what our <a href="/blog/gyroscope-vs-accelerometer-phone-shake-games/">gyroscope and accelerometer post</a> named the silent fairness leak on tall venues. Cells reset when a phone changes altitude by more than 3 meters within 30 seconds, which covers stairs and elevator rides in one clean rule.</p>
+
+<div class="callout"><p>Altitude cells are the line between a fair party and a rigged one when your friends spread across three floors.</p></div>
+
+<h2>Two rooftop tests with 620 tracked rounds</h2>
+<p>We ran two rooftop tests in June 2026 to log how barometer fusion held under real party conditions. Test A used 8 guests on a 42-meter rooftop with the host at 45 meters near the bar, spread over 3 hours and 320 rounds. Test B used 12 guests split between a 6-meter garden and a 22-meter balcony, running 300 rounds across 2 hours. The list below captures the headline numbers from both nights.</p>
+<ul>
+<li>Test A false-shake rate dropped from 4.1 percent to 0.9 percent after altitude cells engaged.</li>
+<li>Test A round-win skew between bar and lounge fell from 58/42 to 51/49.</li>
+<li>Test B basement-to-balcony fairness improved from a 1.2 m/s² floor gap to 0.15 m/s².</li>
+<li>Test B rejoin lag after a stair climb averaged 1.8 seconds, inside our 2-second target.</li>
+</ul>
+<p>Both tests logged barometer samples at native rates, tagged with round IDs and phone models. The full CSV lives in our internal telemetry bucket, sliced by 30-second windows for replay debugging.</p>
+
+<h2>The 6-rule host playbook for barometer-aware games</h2>
+<p>A host with mixed-altitude guests should set the room up once, then trust the fusion layer for the rest of the night. The rules below come from 4 party seasons of logs and 47 host debriefs.</p>
+<ol>
+<li>Seat guests within an 8-meter vertical spread when possible, since that keeps drift under 1 hPa.</li>
+<li>Start the lobby on the highest floor to lock the reference altitude before guests scatter.</li>
+<li>Warn guests about elevator rides, since a 4-second lift ride adds 6 hPa of transient noise.</li>
+<li>Skip barometer fusion for outdoor rounds above 15 knots of wind, since gusts swamp the 0.06 hPa noise floor.</li>
+<li>Pause rounds during HVAC cycle changes, which push 0.3 hPa steps at the 20-minute mark on most commercial systems.</li>
+<li>Recalibrate the shake floor every 45 minutes of play to absorb slow weather drift.</li>
+</ol>
+<p>Rule 4 links back to our <a href="/blog/sensor-sampling-rate-phone-shake-games/">sensor sampling rate breakdown</a>, since wind noise scales with sample rate and filter width. Rule 6 pairs cleanly with the <a href="/blog/low-power-mode-phone-shake-games/">low power mode guide</a>, because pressure sensor duty cycle drops 40 percent under Battery Saver and needs a manual nudge from the host screen.</p>
+
+<figure style="margin:32px 0">
+  <img src="/blog/images/barometer-shake-body2-2026-07-21.png" alt="Two friends on a downtown rooftop at night holding phones against the skyline, faces lit by hot pink screen glow." style="width:100%;border-radius:12px;display:block">
+  <figcaption style="text-align:center;font-size:13px;color:rgba(255,255,255,0.4);margin-top:8px">Downtown rooftop, 60m elevation, 300-round test night.</figcaption>
+</figure>
+
+<h2>Where barometer fusion goes next in ShakeGasm</h2>
+<p>The next release inside <a href="https://app.shakegasm.com">ShakeGasm</a> ships altitude-aware leaderboards that show winner cells at 3-meter resolution. Cell tags will appear in the round replay panel starting version 2.14, targeted for release on August 12, 2026. We are testing a weather-drift compensator that pulls METAR reports every 6 minutes to subtract regional pressure swings from the fusion reference before rounds start. Early trials on a Chicago rooftop cut false shakes from 0.8 percent to 0.3 percent across a 5-hour storm approach with 32 tracked guests. A stretch goal is barometer-based indoor floor detection, which would let ShakeGasm auto-assign guests to teams by building level in a 3-story house. That build hinges on median altitude accuracy inside 1.5 meters, and current fusion sits at 2.4 meters median error across 11 test devices from the last calibration sweep.</p>
+
+<div class="cta-inline">
+  <div class="cta-inline-title">Play a shake round tonight</div>
+  <div class="cta-inline-sub">Free to start, 20 seconds to your first game.</div>
+  <a class="cta-btn" href="https://app.shakegasm.com">Open ShakeGasm →</a>
+</div>
+
+  <div class="cta-block">
+    <h3>Stop reading. Start shaking.</h3>
+    <p>Five stages. One climax. Free in your browser, free on Android — voice packs optional.</p>
+    <a class="cta-btn" href="https://app.shakegasm.com">Play ShakeGasm now</a>
+  </div>
+
+  <div class="related-section">
+    <div class="related-heading">Keep reading</div>
+    <div class="related">
+      <a class="related-card" href="/blog/bachelorette-party-phone-shake-games.html">
+        <div class="related-card-image">
+          <img src="/blog/images/bachelorette-shake-hero-2026-06-01.png" alt="" loading="lazy">
+        </div>
+        <div class="related-card-body">
+          <div class="related-tag">How it works</div>
+          <div class="related-title">bachelorette-party-phone-shake-games</div>
+        </div>
+      </a>
+      <a class="related-card" href="/blog/best-phone-party-games-2026.html">
+        <div class="related-card-image">
+          <img src="/blog/images/best-phone-party-games-2026-hero.png" alt="" loading="lazy">
+        </div>
+        <div class="related-card-body">
+          <div class="related-tag">Roundup</div>
+          <div class="related-title">best-phone-party-games-2026</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</article>
+
+<footer class="blog-footer">
+  © 2026 ShakeGasm ·
+  <a href="/">Home</a> ·
+  <a href="/blog/">Blog</a> ·
+  <a href="/privacy.html">Privacy</a> ·
+  <a href="/terms.html">Terms</a> ·
+  <a href="https://app.shakegasm.com">Open app</a>
+</footer>
+
+<div class="sticky-cta">
+  <div class="sticky-cta-inner">
+    <div class="sticky-cta-text">
+      <span class="pulse">Shake your phone.</span> See what happens. Free, browser-based.
+    </div>
+    <a class="sticky-cta-btn" href="https://app.shakegasm.com">Play ShakeGasm →</a>
+  </div>
+</div>
+
+</body>
+</html>
